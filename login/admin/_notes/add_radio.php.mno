@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_radio" value="name:id;datatype:int,name:nome;datatype:string,name:modelo;datatype:string,name:ip;datatype:string,name:repetidora;datatype:string,name:mac;datatype:string,name:mode;datatype:string,name:operacao;datatype:string,name:imagem;datatype:string" />
+	<infoitem key="UD_qr_marcas" value="name:id;datatype:int,name:marca;datatype:string,name:descricao;datatype:blob,name:site;datatype:string,name:link;datatype:string,name:imagem;datatype:string" />
+</info>

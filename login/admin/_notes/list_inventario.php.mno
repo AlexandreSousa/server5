@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_cliente" value="name:id;datatype:int,name:equipamento;datatype:string,name:descricao;datatype:string,name:data;datatype:string,name:valor;datatype:string,name:usuario;datatype:string,name:destino;datatype:string" />
+</info>

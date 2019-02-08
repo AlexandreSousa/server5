@@ -1,0 +1,24 @@
+#!/bin/bash
+KERNEL=`uname -r`
+LOCAL=`grep 'LOCAL=' /etc/fw.conf | cut -f 2 -d "="`
+IPTLIBS=`ls /lib/modules/$KERNEL/kernel/net/ipv4/netfilter | cut -f 1 -d "."`
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv4/conf/all/rp_filter
+
+    rmmod ipchains > /dev/null 2>&1
+
+    for module in $IPTLIBS sch_cbq sch_tbf sch_sfq sch_prio cls_u32; do
+	modprobe $module
+    done
+
+
+
+$LOCAL/fwperf
+$LOCAL/fwp2p
+#$LOCAL/fwpolicy
+$LOCAL/fwlocal
+$LOCAL/fwstation
+
+iptables -A INPUT -p tcp --syn -j DROP
+echo "FW iniciado"
+

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_tempo" value="name:id;datatype:int,name:id_grupo;datatype:string,name:dia;datatype:string,name:initio_h;datatype:time,name:fin_h;datatype:time,name:acao;datatype:string" />
+	<infoitem key="UD_qr_grupo" value="name:id;datatype:int,name:desc;datatype:string" />
+	<infoitem key="UD_qr_plano_mostra" value="name:id;datatype:int,name:id_grupo;datatype:string,name:dia;datatype:string,name:initio_h;datatype:time,name:fin_h;datatype:time,name:acao;datatype:string" />
+</info>

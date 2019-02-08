@@ -1,0 +1,104 @@
+#!/bin/bash
+
+ARCH=`grep 'ARCH=' /etc/fw.conf | cut -f 2 -d "="`
+WAN1=`grep 'WAN1=' /etc/fw.conf | cut -f 2 -d "="`
+WAN2=`grep 'WAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN1=`grep 'LAN1=' /etc/fw.conf | cut -f 2 -d "="`
+LAN2=`grep 'LAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN3=`grep 'LAN3=' /etc/fw.conf | cut -f 2 -d "="`
+
+# "Protege contra synflood"
+echo "1" > /proc/sys/net/ipv4/tcp_syncookies
+echo "0" > /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+# "Desabilita o suporte a source routed packets"
+echo "0" > /proc/sys/net/ipv4/conf/$LAN2/accept_source_route
+echo "0" > /proc/sys/net/ipv4/conf/$LAN1/accept_source_route
+echo "0" > /proc/sys/net/ipv4/conf/$WAN1/accept_source_route
+
+# "Proteção contra ICMP Broadcasting"
+echo "1" > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts
+ 
+# "Bloqueia traceroute"
+iptables -A INPUT -p udp --dport 33435:33525 -j DROP
+
+# "Protege contra port scanners avançados (Ex.: nmap)"
+#iptables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST RST -m limit --limit 1/s -j ACCEPT
+
+# "Protege contra pacotes que podem procurar e obter informações da rede interna ... "
+#iptables -A FORWARD --protocol tcp --tcp-flags ALL SYN,ACK -j DROP 
+
+# "Protege contra todos os pacotes danificados e ou suspeitos ... "
+#iptables -A FORWARD -m unclean -j DROP
+
+# "Protecoes contra ataques "
+#iptables -A INPUT -m state --state INVALID -j DROP 
+ 
+# "Proteções diversas contra portscanners, ping of death, ataques DoS, etc."
+iptables -A FORWARD -p icmp --icmp-type echo-request -m limit --limit 1/s -j ACCEPT
+iptables -A FORWARD -p tcp -m limit --limit 1/s -j ACCEPT
+iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST RST -m limit --limit 1/s -j ACCEPT
+iptables -A FORWARD --protocol tcp --tcp-flags ALL SYN,ACK -j DROP
+iptables -A FORWARD -m unclean -j DROP
+iptables -A INPUT -m state --state INVALID -j DROP
+iptables -N VALID_CHECK
+iptables -A VALID_CHECK -p tcp --tcp-flags ALL FIN,URG,PSH -j DROP
+iptables -A VALID_CHECK -p tcp --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
+iptables -A VALID_CHECK -p tcp --tcp-flags ALL ALL -j DROP
+iptables -A VALID_CHECK -p tcp --tcp-flags ALL FIN -j DROP
+iptables -A VALID_CHECK -p tcp --tcp-flags SYN,RST SYN,RST -j DROP
+iptables -A VALID_CHECK -p tcp --tcp-flags SYN,FIN SYN,FIN -j DROP
+iptables -A VALID_CHECK -p tcp --tcp-flags ALL NONE -j DROP
+ 
+# "Fecha as portas udp de 1 a 1024"
+iptables -A INPUT -p udp --dport 1:1024 -j DROP
+iptables -A INPUT -p udp --dport 59229 -j DROP
+
+# "Bloqueia uma porta de saída, tanto local quanto forward"
+iptables -A OUTPUT -p tcp --dport 4000 -j DROP
+iptables -A FORWARD -p tcp --dport 4000 -j DROP
+iptables -A OUTPUT -p udp --dport 4000 -j DROP
+iptables -A FORWARD -p udp --dport 4000 -j DROP
+ 
+# "Bloqueia uma porta de saída, tanto local quanto forward"
+iptables -A OUTPUT -p tcp --dport 5190 -j DROP
+iptables -A FORWARD -p tcp --dport 5190 -j DROP
+iptables -A OUTPUT -p udp --dport 5190 -j DROP
+iptables -A FORWARD -p udp --dport 5190 -j DROP
+ 
+# "Bloqueia uma porta de saída, tanto local quanto forward"
+iptables -A OUTPUT -p tcp --dport 6699 -j DROP
+iptables -A FORWARD -p tcp --dport 6699 -j DROP
+iptables -A OUTPUT -p udp --dport 6699 -j DROP
+iptables -A FORWARD -p udp --dport 6699 -j DROP
+ 
+# "Bloqueia uma porta de saída, tanto local quanto forward"
+iptables -A OUTPUT -p tcp --dport 1863 -j DROP
+iptables -A FORWARD -p tcp --dport 1863 -j DROP
+iptables -A OUTPUT -p udp --dport 1863 -j DROP
+iptables -A FORWARD -p udp --dport 1863 -j DROP
+ 
+# "Bloqueia uma porta de saída, tanto local quanto forward"
+iptables -A OUTPUT -p tcp --dport 4099 -j DROP
+iptables -A FORWARD -p tcp --dport 4099 -j DROP
+iptables -A OUTPUT -p udp --dport 4099 -j DROP
+iptables -A FORWARD -p udp --dport 4099 -j DROP
+
+#***************************************************************************************
+# Barrando e Logando o encaminhamento para a porta 139 (Vírus)
+iptables -A FORWARD -p tcp --dport 139 -j LOG --log-prefix "Enc. de 139 descartado: "
+iptables -A FORWARD -p tcp --dport 139 -j REJECT
+iptables -A INPUT -p tcp --dport 139 -j REJECT
+iptables -A INPUT -p tcp --sport 139 -j REJECT
+iptables -A OUTPUT -p tcp --dport 139 -j REJECT
+iptables -A OUTPUT -p tcp --sport 139 -j REJECT
+
+# Barrando e Logando o encaminhamento para a porta 445 (Vírus)
+iptables -A FORWARD -p tcp --dport 445 -j LOG --log-prefix "Enc. de 445 descartado: "
+iptables -A FORWARD -p tcp --dport 445 -j REJECT
+iptables -A INPUT -p tcp --dport 445 -j REJECT
+iptables -A INPUT -p tcp --sport 445 -j REJECT
+iptables -A OUTPUT -p tcp --dport 445 -j REJECT
+iptables -A OUTPUT -p tcp --sport 445 -j REJECT
+

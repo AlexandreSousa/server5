@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_sessao" value="name:id;datatype:int,name:id_logado;datatype:string,name:login;datatype:string,name:ip;datatype:string,name:down;datatype:int,name:up;datatype:int,name:down_left;datatype:int,name:up_left;datatype:int,name:data;datatype:date,name:data_f;datatype:date,name:hora_i;datatype:time,name:hora_f;datatype:time,name:motivo;datatype:string" />
+</info>

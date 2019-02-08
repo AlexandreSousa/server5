@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_list_c_paga" value="name:id;datatype:int,name:tipo_documento;datatype:string,name:n_documento;datatype:string,name:n_parcela;datatype:string,name:valor;datatype:string,name:obs;datatype:string,name:emissao;datatype:date,name:vencimento;datatype:date,name:status;datatype:string,name:data_recebido;datatype:date" />
+</info>

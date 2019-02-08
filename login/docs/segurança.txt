@@ -1,0 +1,6 @@
+Criar sistema de checagen de mac mais ip
+
+se o mac e o ip não for igual desloga
+
+
+checagen a cada 1 minuto 

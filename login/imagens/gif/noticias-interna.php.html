@@ -1,0 +1,687 @@
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Diário Online</title>
+<link href="css/publicidade.css" rel="stylesheet" type="text/css" />
+<link href="css/geral.css" rel="stylesheet" type="text/css" />
+<link href="css/noticias.css" rel="stylesheet" type="text/css" />
+<script src="add/js/js-menu.js" type="text/javascript"></script>
+
+<!-- FORMULÁRIOS DAS FERRAMENTAS DA PÁGINA INTERNA DE NOTÍCIA -->  
+<!-- FORMULÁRIO SUBMENU-->  
+<link rel="stylesheet" type="text/css" media="screen" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/cupertino/jquery-ui.css" />
+<script type="text/javascript" src="add/js/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" src="add/js/jquery.form.js"></script>
+<script type="text/javascript" src="add/js/jquery-validate/jquery.validate.min.js"></script>
+<script type="text/javascript" src="add/js/noticia-interna-submenu.js"></script>
+<script type="text/javascript" src="add/js/noticia-comentario.js"></script>
+<script type="text/JavaScript" src="add/js/zoom-texto.js"></script>
+<script type="text/JavaScript" src="add/js/integracao-comunidade.js"></script>
+<script src="add/js/star-rating/rating/starrating.js" type="text/javascript"></script>
+<link href="add/js/star-rating/rating/starrating.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script type="text/javascript">
+$(document).ready(function(){
+	// ALTERA O CSS DO LINK
+	$('#noticia_conteudo a').addClass('cor_noticias');
+	
+	// RECUPERA OS COMENTARIOS
+	getComentario('1','114566','cor_noticias');
+	getRating('114566');
+	
+	// ADD A COMUNIDADE
+	$("#add-comunidade").click(function($){
+	  	var oInfo = {sOP: 'Noticia', nIdNoticia: '114566', localizacao: 'http://www.diarioonline.com.br/noticias-interna.php?nIdNoticia=114566'};
+		addComunidade(oInfo);
+	});
+});
+
+function showHideDiv(id){
+	var vsDiv = new Array("#divComentar", "#divLerDepois", "#divEnviar", "#divCorrigir", "#divCompartilhar" );
+	for (var i in vsDiv){
+		if(vsDiv[i] == "#"+id){
+			oDiv = document.getElementById(id);
+			if(oDiv.style.display == 'block'){
+				$("#"+id).slideUp();
+			}else{
+				$("#"+id).slideDown();	
+			}
+		}else{
+			$(vsDiv[i]).slideUp();	
+		}
+	}
+	return false;
+}
+
+/*function ajaxForm(sForm){
+	switch(sForm){
+		case 'comentar':
+			$("#formComentar").ajaxSubmit({ type: 'post', url: 'app/painel/modulo-noticia/ferramenta/comentar.php', success: sucessoComentario });	
+		break;
+		case 'enviar':
+			$("#formEnviar").ajaxSubmit({ type: 'post', url: 'app/painel/modulo-noticia/ferramenta/enviar.php', success: sucessoEnvio });
+		break;
+		case 'notificar':
+			$("#formCorrigir").ajaxSubmit({ type: 'post', url: 'app/painel/modulo-noticia/ferramenta/notificar.php', success: sucessoNotificacao });
+		break;
+	}
+}*/
+
+</script>
+
+<!-- AQUI VAI O ESTILO CSS -->
+
+<!--<style type="text/css">
+	#noticia-conteudo {}
+	.noticia-conteudo-fonte-1 { font-size: 12px; }
+	.noticia-conteudo-fonte-2 { font-size: 16px; }
+	.noticia-conteudo-fonte-3 { font-size: 20px; }
+</style>-->
+
+
+
+<!-- STAR RATING - VOTO DA NOTÍCIA -->  
+<!--<script src="add/js/star-rating/rating/jquery.min.js" type="text/javascript"></script>-->
+
+
+<!-- FORMULÁRIOS DAS FERRAMENTAS DA PÁGINA INTERNA DE NOTÍCIA -->  
+<!-- fim FORMULÁRIO SUBMENU-->  
+</head>
+
+<body>
+<div id="geral">
+  <div id="topo1">
+  		<meta http-equiv="Cache-Control" content="no-cache, no-store" />
+	<meta http-equiv="Pragma" content="no-cache, no-store" />
+	<script language="Javascript" src="add/js/von.js" type="text/javascript"></script>
+	<script type="text/javascript" language="JavaScript">
+		
+		function carregatopo () {
+			var datax = new Date();
+			$("#zonatopo").load('ban-top.php?url=/noticias-interna.php?nIdNoticia=114566&bannernotcat=5&x='+(datax.getTime()+1));
+
+		}
+		
+		function carregaretangulo (tempo) {
+			var datax = new Date();
+			$("#zonaretangulo"+tempo+"").load('ban-retang.php?url=/noticias-interna.php?nIdNoticia=114566&bannernotcat=5&x='+(datax.getTime()+tempo));
+		}
+
+		
+		$(document).ready(function(){
+			$.getJSON('inc/box/topo/box-clima-tempo.php', function(data){
+					$("#weather > p").html(data.temperatura);
+					$("#data > p").html(data.data_hora_cidade);
+					$("#img-tempo").attr("src",data.icone_temperatura);
+			});
+			
+			var datax = new Date();
+			setTimeout("carregatopo(1);",1000);
+			setTimeout("carregaretangulo(1);",2000);
+			setTimeout("carregaretangulo(2);",3000);
+			
+		
+		
+			$("#filtroTOPO").change(function(){
+				switch($("#filtroTOPO :selected").val()){
+					case "Audio":
+						$("#topsrc").attr("action","audios-busca.php?buscaAudio="+$("#por").val()+"&audio_select=0");
+					break;
+					case "Imagem":
+						$("#topsrc").attr("action","imagens-busca.php?sPesqGal="+$("#por").val()+"&catGal=0");
+					break;
+					case "Video":
+						$("#topsrc").attr("action","videos_busca.php?busca="+$("#por").val()+"&busca_video_categoria=0");
+					break;
+					default:
+						$("#topsrc").attr("action","busca.php");
+					break;
+				}
+			});
+			
+			$("#por").attr("value","Digite aqui sua busca");
+			$("#por").click(function(){
+				$("#por").attr("value","");
+			});
+		});
+	</script>
+<link rel="shortcut icon" href="img/favicon.png" />
+<div id="topo"> 
+  <div id="barratop-rba">
+  <ul>
+  <li class="mbarratop-rba"><a href="http://diariodopara.diarioonline.com.br" target="_blank" title="Diário do Pará"><img src="img/mtop_01.png" alt="Diário do Pará" border="0" /></a></li>
+  <li class="mbarratop-rba"><a href="http://tvrba.diarioonline.com.br" target="_blank" title="TV RBA"><img src="img/mtop_02.png" alt="TV RBA" border="0" /></a></li>
+  <li class="mbarratop-rba"><a href="http://radio99.diarioonline.com.br" target="_blank" title="Rádio 99 Fm"><img src="img/mtop_03.png" alt="Rádio 99 Fm" border="0" /></a></li>
+  <li class="mbarratop-rba"><a href="http://radiodiariofm.diarioonline.com.br" target="_blank" title="Rádio Diário FM"><img src="img/mtop_04.png" alt="Rádio Diário FM" border="0" /></a></li>
+  
+  <li class="mbarratop-rba"><a href="http://radioclube.diarioonline.com.br" target="_blank" title="Rádio Clube do Pará"><img src="img/mtop_05.png" alt="Rádio Clube do Pará" border="0" /></a></li>
+  <li class="mbarratop-rba1"><a href="tem.php" target="_self" title="TEM! (Classificados)"><img src="img/mtop_00.png" alt="TEM! (Classificados)" border="0" /></a></li>
+  </ul>
+    
+  </div>
+  <a href="index.php" title="DOL - DiárioOnLine"><img src="img/DOL.png" border="0" id="dol-logo" /></a>
+  <div id="line-1"> <img src="img/publicidade.png" /> 
+    
+  <div id="banner728x90">
+    
+  <div id="zonatopo"></div>
+    
+  </div> <!-- 728 x 90 topo banner -->
+    
+    
+  </div>
+  <div id="line-2"> 
+  <div id="data"><p></p></div>
+  <div id="weather"><img id="img-tempo" src="" width="20" title="Tempo em Belém" class="fl"/><p></p></div>
+  <div id="login-icon"><a href="login.php" title="Faça seu login"><img src="img/logcad.jpg" alt="Login" border="0" /></a>  </div>
+  <div id="cads-icon"> <a href="cadastro.php" title="Cadastre-se no Diário Online"><img src="img/logcad1.jpg" alt="Cadastro" border="0" /></a> </div> 
+  <div id="busca-topo"> 
+  <script src="add/js/js-funcs-busca.js" type="text/javascript"></script>
+    
+    
+    
+
+  <form name="topsrc" method="post" action="busca.php" id="topsrc" onSubmit="javascript: return validab();" style="display:inline;">
+  <div class="buscamarg" style="padding-left:20px;"><input name="Buscar" type="text" class="buscafild" id="por" value="" size="20" onclick="onclickbusca()"   onblur="onblurbusca()" title="Digite aqui sua busca"/>
+  <!--<div class="contas_dol_topo"><a href="#" target="_blank" title="Orkut Diário Online"><img alt="orkut" src="img/icones/serv-08-orkut-p.png" /></a></div>
+  <div class="contas_dol_topo"><a href="#" target="_blank" title="Facebook Diário Online"><img alt="facebook" src="img/icones/serv-06-facebook-p.png" /></a></div>
+  <div class="contas_dol_topo"><a href="http://twitter.com/doldiarioonline" target="_blank" title="Twitter Diário Online"><img alt="twitter" src="img/icones/serv-07-twitter-p.png" /></a></div>-->  
+  <div class="twitter_topo"><a href="http://twitter.com/doldiarioonline" target="_blank" title="twitter Diário Online"><img alt="twitter" src="img/twitter.jpg" /></a></div>
+  <input type="image" src="img/busend.png" width="16" height="16" id="go" alt="Busca" class="sendbutton" title="Buscar" />
+  </div>
+    
+    
+    
+    
+    </div>
+    </form>
+  </div>
+  
+  <div id="line-3">
+  <ul id="sddm">
+    <li><a href="noticias" target="_self" onmouseover="mopen('m1')" onmouseout="mclosetime()"><img src="img/mm01.png" alt="Notícias" /></a>
+      <div id="m1" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a target="_self" class="" href="para" title="Pará" >Pará</a>
+        <a target="_self" class="" href="brasil" title="Brasil" >Brasil</a>
+        <a target="_self" class="" href="mundo" title="Mundo" >Mundo</a>
+        <a target="_self" class="" href="eleicoes" title="Eleições" >Eleições</a>
+        <a target="_blank" class="" href="cirio" title="Círio" >Círio</a>
+        <a target="_self" class="" href="policia" title="Polícia" >Polícia</a>
+        <a target="_self" class="" href="tecnologia" title="Tecnologia" >Tecnologia</a>
+        <a target="_self" class="" href="cultura" title="Cultura" >Cultura</a>
+        </div>
+      </li>
+    <li><a href="esporte" target="_self" onmouseover="mopen('m2')" onmouseout="mclosetime()"><img src="img/mm02.png" alt="Esporte" /></a>
+      <div id="m2" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a target="_self" class="" href="futebol-para" title="Futebol Pará" >Futebol Pará</a>
+        <a target="_self" class="" href="futebol-brasil" title="Futebol Brasil" >Futebol Brasil</a>
+        <a target="_self" class="" href="futebol-mundo" title="Futebol Mundo" >Futebol Mundo</a>
+        <a target="_self" class="" href="futebol-outros" title="Outros esportes" >Outros esportes</a>
+        </div>
+      </li>
+    <li><a href="voce" target="_self" onmouseover="mopen('m3')" onmouseout="mclosetime()"><img src="img/mm03.png" alt="Você" /></a>
+      <div id="m3" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a target="_self" class="" href="agito" title="Agito" >Agito</a>
+        <a target="_self" class="" href="blogs" title="Blogs" >Blogs</a>
+        <a target="_self" class="" href="cinema" title="Cinema" >Cinema</a>
+        <a target="_self" class="" href="ensaio" title="Ensaio" >Ensaio</a>
+        <a target="_self" class="" href="fama" title="Fama" >Fama</a>
+        <a target="_self" class="" href="games" title="Games" >Games</a>
+        <a target="_self" class="" href="musica" title="iMusica" >iMusica</a>
+        <a target="_self" class="" href="kids" title="Kids" >Kids</a>
+        </div>
+      </li>
+    <li><a href="comunidade" target="_blank" onmouseover="mopen('m4')" onmouseout="mclosetime()"><img src="img/mm04.png" alt="Comunidade" /></a>
+      </li>
+    <li><a href="guia" target="_self" onmouseover="mopen('m5')" onmouseout="mclosetime()"><img src="img/mm05.png" alt="Guia" /></a>
+      <div id="m5" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a target="_self" class="" href="guia-agenda" title="Agenda" >Agenda</a>
+        <a target="_self" class="" href="guia" title="Belém" >Belém</a>
+        </div>
+      </li>
+    <li><a href="galerias" target="_self" onmouseover="mopen('m6')" onmouseout="mclosetime()"><img src="img/mm06.png" alt="Galeria" /></a>
+      <div id="m6" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a target="_self" class="" href="videos" title="Vídeo" >Vídeo</a>
+        <a target="_self" class="" href="imagens" title="Imagem" >Imagem</a>
+        <a target="_self" class="" href="audios" title="Áudio" >Áudio</a>
+        </div>
+      </li>
+    <li><a href="shopping" target="_self" onmouseover="mopen('m7')" onmouseout="mclosetime()"><img src="img/mm07.png" alt="Shopping" /></a>
+      </li>
+    </ul>
+  <div style="clear:both"></div>
+  </div>
+  <div id="line-4">
+  <div id="logotem" class="topodoodle">
+<iframe name='zona66' src='inc/ban-zonas/66-zona.php' frameborder='0' scrolling='no' width='188' height='58'></iframe>
+  </div>
+    <div id="icon-menu"> 
+    <ul>
+        <!--<li style="background:url(img/conteudo/i-m52.jpg) no-repeat top center;" ><a target="_blank" href="proc-clique.php?nIdMenuAtalho=52&sUrl=http://www.diariodopara.com.br/hotsite/enem/" title="Enem">Enem</a></li>-->
+        <li style="background:url(img/conteudo/i-m52.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=52&sUrl=http://www.diariodopara.com.br/hotsite/enem/','_blank');" title="Enem">Enem</a></li>
+        <!--<li style="background:url(img/conteudo/i-m54.jpg) no-repeat top center;" ><a target="_blank" href="proc-clique.php?nIdMenuAtalho=54&sUrl=http://ee.diariodopara.com.br/Default.aspx?pID=69&eID=8438&lP=0&rP=1&lT=page" title="Personalidades">Personalidades</a></li>-->
+        <li style="background:url(img/conteudo/i-m54.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=54&sUrl=http://ee.diariodopara.com.br/Default.aspx?pID=69&eID=8438&lP=0&rP=1&lT=page','_blank');" title="Personalidades">Personalidades</a></li>
+        <!--<li style="background:url(img/conteudo/i-m45.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=45&sUrl=http://www.diarioonline.com.br/eleicoes" title="Eleições">Eleições</a></li>-->
+        <li style="background:url(img/conteudo/i-m45.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=45&sUrl=http://www.diarioonline.com.br/eleicoes','_self');" title="Eleições">Eleições</a></li>
+        <!--<li style="background:url(img/conteudo/i-m46.jpg) no-repeat top center;" ><a target="_blank" href="proc-clique.php?nIdMenuAtalho=46&sUrl=http://www.diarioonline.com.br/cirio" title="Círio">Círio</a></li>-->
+        <li style="background:url(img/conteudo/i-m46.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=46&sUrl=http://www.diarioonline.com.br/cirio','_blank');" title="Círio">Círio</a></li>
+        <!--<li style="background:url(img/conteudo/i-m31.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=31&sUrl=http://www.diarioonline.com.br/capa-blogs.html" title="Blogs">Blogs</a></li>-->
+        <li style="background:url(img/conteudo/i-m31.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=31&sUrl=http://www.diarioonline.com.br/capa-blogs.html','_self');" title="Blogs">Blogs</a></li>
+        <!--<li style="background:url(img/conteudo/i-m47.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=47&sUrl=http://www.diarioonline.com.br/agito" title="Agito">Agito</a></li>-->
+        <li style="background:url(img/conteudo/i-m47.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=47&sUrl=http://www.diarioonline.com.br/agito','_self');" title="Agito">Agito</a></li>
+        <!--<li style="background:url(img/conteudo/i-m41.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=41&sUrl=http://www.diarioonline.com.br/ensaio" title="Ensaio">Ensaio</a></li>-->
+        <li style="background:url(img/conteudo/i-m41.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=41&sUrl=http://www.diarioonline.com.br/ensaio','_self');" title="Ensaio">Ensaio</a></li>
+        <!--<li style="background:url(img/conteudo/i-m36.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=36&sUrl=http://www.diarioonline.com.br/games" title="Games">Games</a></li>-->
+        <li style="background:url(img/conteudo/i-m36.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=36&sUrl=http://www.diarioonline.com.br/games','_self');" title="Games">Games</a></li>
+        <!--<li style="background:url(img/conteudo/i-m40.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=40&sUrl=http://www.diarioonline.com.br/musica" title="iMusica">iMusica</a></li>-->
+        <li style="background:url(img/conteudo/i-m40.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=40&sUrl=http://www.diarioonline.com.br/musica','_self');" title="iMusica">iMusica</a></li>
+        <!--<li style="background:url(img/conteudo/i-m42.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=42&sUrl=http://www.diarioonline.com.br/guia-agenda" title="Agenda">Agenda</a></li>-->
+        <li style="background:url(img/conteudo/i-m42.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=42&sUrl=http://www.diarioonline.com.br/guia-agenda','_self');" title="Agenda">Agenda</a></li>
+        <!--<li style="background:url(img/conteudo/i-m43.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=43&sUrl=http://www.diarioonline.com.br/anuncie.php" title="Anuncie">Anuncie</a></li>-->
+        <li style="background:url(img/conteudo/i-m43.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=43&sUrl=http://www.diarioonline.com.br/anuncie.php','_self');" title="Anuncie">Anuncie</a></li>
+        <!--<li style="background:url(img/conteudo/i-m44.jpg) no-repeat top center;" ><a target="_self" href="proc-clique.php?nIdMenuAtalho=44&sUrl=http://www.diarioonline.com.br/assine.php" title="Assine">Assine</a></li>-->
+        <li style="background:url(img/conteudo/i-m44.jpg) no-repeat top center;cursor:pointer;" ><a onclick="window.open('proc-clique.php?nIdMenuAtalho=44&sUrl=http://www.diarioonline.com.br/assine.php','_self');" title="Assine">Assine</a></li>
+        </ul>
+    </div><!-- fim #icon-menu -->
+    <div class="clearfix">
+</div>
+  </div><!-- fim #line4 -->
+</div>
+
+  </div>
+ <div id="barra_lateral"><div id="publicidade">
+
+<div id="publicidadelateral" >
+            <div class="banner265x200" style="width:300px; height:250px; z-index:1; ">
+              <div id="zonaretangulo1"></div>
+ </div>            
+                     
+            </div>
+           
+            <div id="edicao" class="ee">
+            	<object width="300" height="150" id="undefined" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+                <param value="add/swf/edicao-eletronica.swf" name="movie"><param value="sameDomain" name="allowScriptAccess"><param value="high" name="quality"><name="wmode"><embed width="300" height="150" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" quality="high" src="add/swf/edicao-eletronica.swf" swliveconnect="true" allowscriptaccess="sameDomain" name="undefined" id="undefined"></object>
+            </div>
+      
+            <div id="barrabuscape" style="margin:10px 0;">
+            	<iframe src="http://templates.buscape.com/dynatemplate/dol_300x700_1.html?type=300x700_1" width="300" height="700" frameborder="0" name="shopprodape" scrolling="no"></iframe></div>    
+            </div>
+            <div class="banner265x200" >
+<div id="zonaretangulo2" ></div>
+
+ </div>
+ <div id="barrabuscape" style="margin:10px 0; height:auto;">
+ 
+ </div>
+ 
+ <script language="javascript">
+ 	var edicao = document.getElementById('edicao');
+	//if(document.location.href
+	if((navigator.userAgent.match(/iPad/i) == null)||(navigator.userAgent.match(/iPad/i) == '')){
+		edicao.innerHTML = '<object width="300" height="150" id="undefined" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"><param value="add/swf/edicao-eletronica.swf" name="movie"><param value="sameDomain" name="allowScriptAccess"><param value="high" name="quality"><name="wmode"><embed width="300" height="150" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" quality="high" src="add/swf/edicao-eletronica.swf" swliveconnect="true" allowscriptaccess="sameDomain" name="undefined" id="undefined"></object>';
+	} else {
+		edicao.innerHTML = '<img src="img/edicao-eletronica.jpg" onclick="alert(\'Seu dispositivo não tem suporte para exibir a edição eletrônica do Diário do Pará\')" style="cursor: pointer">';
+	}
+ </script></div>
+  <div id="conteudo">
+  <div id="box_noticias">
+  	<div class="box_titulo cor_noticias_bg">
+    	<div class="titulo_caminho">
+        	<a href="index.php"><img alt="voltar ao inicio do site" src="img/ico-home.png" onmouseover="this.src='img/ico-home2.png'" onmouseout="this.src='img/ico-home.png'" class="fl" /></a> | 
+        	<a href="categorias.php?nIdCategoria=1">Notícias</a> |
+        </div>
+        <div class="titulo"><a href="index.php">Brasil</a></div>
+        
+        <div class="box_titulo_divisoria"><img src="img/divisoria-barra-titulos.png" /></div>
+    </div>
+	<div class="box_titulo_mais_detalhes">
+           <div class="titulo_mais_detalhes"><a href="categoria-mais.php?nIdCategoria=5" title="+ Brasil">+ Brasil</a></div>
+          
+    </div><!-- fim do titulo--> 
+    <div id="box_noticia_interna">
+    	<p class="titulo_noticia_interna">PR: quase 5 mil comprimidos são apreendidos</p>
+    	<div id="box_data_noticia" class="comentarios_texto">S&aacute;bado, 23/10/2010, 21:22:32</div>
+   		<div class="clearfix"></div>
+    </div><!-- fim #box_noticia_interna--> 
+    <div class="clearfix"></div>
+     
+    <div id="tamanhofonte">
+          <div id="font_size">Tamanho da fonte: <a href="javascript:zoomTexto('noticia_conteudo',-1)" class="menos" title="Diminuir o tamanho da fonte">A-</a> <a href="javascript:zoomTexto('noticia_conteudo',1)" class="mais" title="Aumentar o tamanho da fonte">A+</a></div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="box_noticia_interna">
+    	<div id="noticia_conteudo">
+        <p style="text-align: justify;">Uma a&ccedil;&atilde;o conjunta entre a For&ccedil;a Nacional de Seguran&ccedil;a e a Pol&iacute;cia Federal apreendeu 4,8 mil comprimidos para emagrecer, abortivos e contra a impot&ecirc;ncia sexual, transportados por uma van em Foz do Igua&ccedil;u (PR) na tarde deste s&aacute;bado (23). O ve&iacute;culo tinha placa do Paraguai.</p><br />
+<p style="text-align: justify;">Al&eacute;m das c&aacute;psulas, o autom&oacute;vel continha equipamentos eletr&ocirc;nicos, celulares e rel&oacute;gios, de acordo com a For&ccedil;a Nacional de Seguran&ccedil;a. O material foi levado para a delegacia da PF na regi&atilde;o, mas ningu&eacute;m foi preso. (eBAND)</p>
+        <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="clearfix"></div>
+         <div class="add_not_comu">
+         	<!--<a id="add-comunidade" style=" cursor:pointer" title="Adicionar ao meu perfil"><img src="img/add-noticia-comu.png" onmouseover="this.src='img/add-noticia-comu2.png'" onmouseout="this.src='img/add-noticia-comu.png'"></a>-->
+         	 <form action="http://comunidade.diarioonline.com.br/dol-fav-noticias-regist.php" method="post" name="formcomu" target="iframecm" style="display:inline">
+               <input type="image" name="imageField" id="imageField" src="img/add-noticia-comu.png" onmouseover="this.src='img/add-noticia-comu2.png'" onmouseout="this.src='img/add-noticia-comu.png'"/><iframe src="" name="iframecm" width="1" height="1" frameborder="0"></iframe>
+                    <input name="DOL_COMU_FAVID" type="hidden" id="DOL_COMU_FAVID" value="114566" />
+                    <input name="DOL_COMU_FAV_TIT" type="hidden" id="DOL_COMU_FAV_TIT" value="PR: quase 5 mil comprimidos são apreendidos" />
+                    <input name="DOL_COMU_FAV_DESC" type="hidden" id="DOL_COMU_FAV_DESC" value="Uma a&ccedil;&atilde;o conjunta entre a For&ccedil;a Nacional de Seguran&ccedil;a e a Pol&iacute;cia Federal apreendeu 4,8 mil comprimidos para emagrecer, abortivos e contra a impot&ecirc;ncia..." />
+                   
+                    <input name="DOL_COMU_FAV_IMG" type="hidden" id="DOL_COMU_FAV_IMG" value="" />
+                    <input name="DOL_COMU_FAV_URLOR" type="hidden" id="DOL_COMU_FAV_URLOR" value="noticia-interna.php?nIdNoticia=114566" />
+              </form> <!--<input name="DOL_COMU_FAV_DT" type="hidden" id="DOL_COMU_FAV_DT" value="" />
+                    <input name="DOL_COMU_FAV_HR" type="hidden" id="DOL_COMU_FAV_HR" value="" />-->
+         </div>
+         
+        
+         
+         
+         
+         <div id="nota_noticia">Que nota você dá para esta notícia? 
+             <ul class='star-rating'>
+              <li class="current-rating" id="current-rating"><!-- will show current rating --></li>
+              <span id="ratelinks">
+              <li><a href="javascript:void(0)" title="1 estrela" class="one-star">1</a></li>
+              <li><a href="javascript:void(0)" title="2 estrelas" class="two-stars">2</a></li>
+              <li><a href="javascript:void(0)" title="3 estrelas" class="three-stars">3</a></li>
+              <li><a href="javascript:void(0)" title="4 estrelas" class="four-stars">4</a></li>
+              <li><a href="javascript:void(0)" title="5 estrelas" class="five-stars">5</a></li>
+              </span>
+            </ul>
+         </div>
+         <div class="clearfix"></div>
+         <div class="sub_menu cor_noticias_bg">
+    <ul class="submenu">
+    	<li class="sm-links"><a id="linkCorrigir" title="Notificar erro" onclick="javascript:showHideDiv('divCorrigir');"><img src="img/sm-erro.png"/></a></li>
+        <li class="sm-divisoria"><img src="img/divisoria-submenu.png" /></li>
+        <li class="sm-links"><a id="linkCompartilhar" title="Compatilhar" onclick="javascript:showHideDiv('divCompartilhar');"><img src="img/sm-compartilhar.png"/></a></li>
+        <li class="sm-divisoria"><img src="img/divisoria-submenu.png" /></li>
+        <li class="sm-links"><a id="linkImprimir" target="_blank" href="app/painel/modulo-noticia/ferramenta/imprimir.php?nIdNoticia=114566" title="Imprimir"><img src="img/sm-imprimir.png"/></a></li>
+        <li class="sm-divisoria"><img src="img/divisoria-submenu.png" /></li>
+        <li class="sm-links"><a id="linkComentar" title="Comentar" onclick="javascript:showHideDiv('divComentar');"><img src="img/sm-comentar.png"/></a></li>
+    </ul>
+    </div><!-- fim #submenu-->
+    <div class="clearfix"></div>
+    <div id="formularios">
+		<div id="contactFormContainer">
+            <!--INICIO DO FORMULARIO 1-->
+                <div id="divLerDepois">
+                    <form action="ler-depois.php" method="post" id="formLerDepois">
+                    <fieldset>
+                    	<div id="texto_formulario" class="cor_noticias">Ler depois</div>
+						<label for="Email">Seu E-mail:</label>
+                        <input id="email" type="text" name="email" />
+                        <div class="clearfix"></div>
+						<label for="Mensagem">Mensagem:</label>
+                        <textarea id="mensagem" cols="20" name="mensagem" rows="3" size="28"></textarea>
+                          <div class="clearfix"></div>
+                        <input class="cor_noticias_bg" id="enviar-comentario" type="submit" value="Enviar" name="submit" onClick="closeForm()" /><br>
+                        <div class="clearfix"></div>
+                   </fieldset>
+                   </form>
+               </div>
+               <!--FIM DO FORMULARIO 1-->
+               <!--INICIO DO FORMULARIO 1-->
+                <div id="divComentar">
+                    <form method="post" name="formComentar" id="formComentar">
+                    <input type="hidden" name="fIdNoticia" id="fIdNoticia" value="114566" />
+                    <fieldset>
+                    	<div id="texto_formulario" class="cor_noticias">Comentar</div>
+						<label for="Nome">Nome:</label>
+                        <div class="clearfix"></div>
+                        <input id="nome" type="text" name="nome" />
+                          <div class="clearfix"></div>
+                        <label for="Email">E-mail:</label>
+                        <div class="clearfix"></div>
+                        <input id="email" type="text" name="email" />
+						  <div class="clearfix"></div>
+                        <label for="Comentario">Comentário:</label>
+                        <textarea id="comentario" cols="21" name="comentario" rows="3"></textarea>
+                        
+                        <!--<tr>
+                        <td width="109"><font color="#000"><strong>Informe o C&oacute;digo</strong>:</font></td>
+                        <td width="80"><input name="captcha" type="text" class="fale" id="captcha" style="width:70px;" value="" size="3" maxlength="6"  /></td>
+                        <td width="111"><font color="#000"><img src="captcha.php" align="absmiddle"/></font></td>
+                        </tr>-->
+                        
+                        <div class="clearfix"></div>
+                        <label for="Comentario">Informe o C&oacute;digo:</label>
+                        <div class="clearfix"></div>
+                        <input name="captcha" type="text" id="captcha" style="width:70px;" value="" size="3" maxlength="6"  />
+                        <font color="#000"><img src="captcha.php" align="absmiddle"/></font>
+                        
+                        <div class="clearfix"></div>
+                        <input class="cor_noticias_bg" id="enviar-comentario" type="submit" value="Enviar" name="submit" onClick="closeForm()" /><br>
+                        <div class="clearfix"></div>
+                   </fieldset>
+                   </form>
+               </div>
+               <!--FIM DO FORMULARIO 1-->
+               <!--INICIO DO FORMULARIO 1-->
+               <div id="divEnviar">
+                     <form action="enviar.php" method="post" id="formEnviar">
+                        <input type="hidden" id="idNoticia" name="idNoticia" value="114566" />
+                        <fieldset>
+                        	<div id="texto_formulario" class="cor_noticias">Enviar</div>
+                            <label for="Nome">Nome:</label>
+                            <input id="nome" name="nome" type="text" />
+                              <div class="clearfix"></div>
+                            <label for="Email">Seu E-mail:</label>
+                            <input id="email" name="email" type="text" />
+                              <div class="clearfix"></div>
+                            <label for="Email">E-mail do seu amigo:</label>
+                            <input id="emailAmigo" name="emailAmigo" type="text" />
+                            <div class="clearfix"></div>
+                            <label for="Comentario">Informe o C&oacute;digo:</label>
+                            <div class="clearfix"></div>
+                            <input name="captcha3" type="text" id="captcha3" style="width:70px;" value="" size="3" maxlength="6"  />
+                            <font color="#000"><img src="captcha.php?sCaptcha=captcha3" align="absmiddle"/></font>
+                            <div class="clearfix"></div>
+                            <input class="cor_noticias_bg" id="enviar-comentario" type="submit" value="Enviar" name="submit" onClick="closeForm()" /><br>
+                            <div class="clearfix"></div>
+                       </fieldset>
+                   </form>
+               </div>
+            <!--FIM DO FORMULARIO 1-->
+            <!--INICIO DO FORMULARIO 1-->
+               <div id="divCorrigir">
+                	<form action="corrigir.php" method="post" id="formCorrigir">
+                        <input type="hidden" name="fIdNoticia" id="fIdNoticia" value="114566" />
+                        <fieldset>
+                        	<div id="texto_formulario" class="cor_noticias">Notificar erro</div>
+                            <label for="Nome">Nome:</label>
+                              <div class="clearfix"></div>
+                            <input id="nome" name="nome" type="text" />
+                              <div class="clearfix"></div>
+                            <label for="Email">Seu E-mail:</label>
+                              <div class="clearfix"></div>
+                            <input id="email" name="email" type="text" />
+                              <div class="clearfix"></div>
+                            <label for="Correcao">Sua correção da notícia:</label>
+                            <textarea id="notificacao" name="notificacao" cols="21" rows="3"></textarea>
+                             <div class="clearfix"></div>
+                            <label for="Comentario">Informe o C&oacute;digo:</label>
+                            <div class="clearfix"></div>
+                            <input name="captcha2" type="text" id="captcha2" style="width:70px;" value="" size="3" maxlength="6"  />
+                            <font color="#000"><img src="captcha.php?sCaptcha=captcha2" align="absmiddle"/></font>
+                             <div class="clearfix"></div>
+                            <input class="cor_noticias_bg" id="enviar-comentario" type="submit" value="Enviar" name="submit" onClick="closeForm()" /><br>
+                            <div class="clearfix"></div>
+                       </fieldset>
+                   </form>
+               </div>
+            <!--FIM DO FORMULARIO 1-->
+            <!--INICIO DO FORMULARIO 1-->
+  				<div id="divCompartilhar">
+                	<div id="texto_formulario" class="cor_noticias">Compartilhar</div>
+                    <div id="div-compartilhar"><a target="_blank" href="http://www.facebook.com/sharer.php?u=http://www.diarioonline.com.br/noticias-interna.php?nIdNoticia=114566&t=PR%3A+quase+5+mil+comprimidos+s%C3%A3o+apreendidos" title="Espalhar no FaceBook">
+                        <img src="img/icones/serv-06-facebook-p.png" class="fl sb" />
+                        <p>Facebook</p>
+               		</a></div>
+               		<div id="div-compartilhar">
+                    	<a target="_blank" href="app/painel/modulo-noticia/ferramenta/twitter.php?sUrl=http://www.diarioonline.com.br/noticias-interna.php?nIdNoticia=114566&sTitulo=PR%3A+quase+5+mil+comprimidos+s%C3%A3o+apreendidos&sChapeu=OPERA%C3%87%C3%83O" title="Espalhar no Twitter">
+                            <img src="img/icones/serv-07-twitter-p.png"  class="fl sb"/>
+                            <p>Twitter</p>
+                    	</a>
+                    </div>
+                    <!--<a href="#"><div id="div-compartilhar">
+          				<img src="img/icones/comunidade-p.png"  class="fl sb"/>
+                        <p>Comunidade</p>
+                    </div></a>-->
+  					<div id="div-compartilhar"><a target="_blank" href="http://promote.orkut.com/preview?nt=orkut.com&tt=PR%3A+quase+5+mil+comprimidos+s%C3%A3o+apreendidos&du=http://www.diarioonline.com.br/noticias-interna.php?nIdNoticia=114566&cn=Uma+a%26ccedil%3B%26atilde%3Bo+conjunta+entre+a+For%26ccedil%3Ba+Nacional+de+Seguran%26ccedil%3Ba+e+a+Pol%26iacute%3Bcia+Federal+apreendeu+4%2C8+mil+comprimidos+para+emagrecer%2C+abortivos+e+contra+a+impot%26ecirc%3Bncia..." title="Espalhar no Orkut">
+                        <img src="img/icones/serv-08-orkut-p.png"  class="fl sb"/>
+                        <p>Orkut</p>
+            </a></div>
+            <div id="div-compartilhar" style="cursor:pointer;"><a id="linkEnviar" onclick="javascript:showHideDiv('divEnviar');" title="Enviar por e-mail">
+                        <img src="img/icones/email-p.png"  class="fl sb"/>
+                        <p>E-mail</p>
+            </a></div>
+          <div class="clearfix"></div>
+          </div>
+            <!--FIM DO FORMULARIO 1-->
+            </div>
+        </div><!-- fim #formularios-->  
+        
+    <div class="clearfix"></div> 
+    </div><!-- fim #box_noticia_interna-->
+  </div><!-- fim #box_noticias--> 
+  
+  <div class="modulo_publicidade">
+    <img src="img/publicidade-banner.jpg" class="fl"/>
+    <div class="publicidade_banner">
+    <iframe src="inc/ban-zonas/6-zona.php" name="zona6" height="60" width="120" frameborder="0" scrolling="no"></iframe>
+    </div>
+    <div class="publicidade_banner">
+    <iframe src="inc/ban-zonas/4-zona.php" name="zona4" height="60" width="468" frameborder="0" scrolling="no"></iframe>
+    </div>
+</div>
+  <div id="box_noticias">
+    <!--<img src="img/t-noticias-relacionadas.jpg" class="fl"/>-->
+    <div class="titulo_mais_subcategoria cor_noticias">Mais em Brasil</div>
+    <div id="box_noticia_interna" style="float:left;">
+    	<p class="texto_data_nr">23/10/2010 | <a href="noticias-interna.php?nIdNoticia=114571" title="Ceará investiga supostos casos de superbactéria"><span class="texto_nr">Ceará investiga supostos casos de superbactéria</span></a> </p>
+    	<p class="texto_data_nr">23/10/2010 | <a href="noticias-interna.php?nIdNoticia=114565" title="Mega-Sena: prêmio sai para apostador de BH"><span class="texto_nr">Mega-Sena: prêmio sai para apostador de BH</span></a> </p>
+    	<p class="texto_data_nr">23/10/2010 | <a href="noticias-interna.php?nIdNoticia=114563" title="Estados confirmam casos de superbactéria"><span class="texto_nr">Estados confirmam casos de superbactéria</span></a> </p>
+    	<p class="texto_data_nr">23/10/2010 | <a href="noticias-interna.php?nIdNoticia=114558" title="Amazonas passa pela pior seca desde 1993"><span class="texto_nr">Amazonas passa pela pior seca desde 1993</span></a> </p>
+    	<p class="texto_data_nr">23/10/2010 | <a href="noticias-interna.php?nIdNoticia=114557" title="MG: monomotor cai e deixa duas pessoas mortas"><span class="texto_nr">MG: monomotor cai e deixa duas pessoas mortas</span></a> </p>
+    	</div>
+    <div class="box_mais_rel">
+      <p><a href="categoria-mais.php?nIdCategoria=5" title="+ Brasil">+ Brasil</a></p></div>
+    <div class="box_divisoria_rel"><img src="img/divisoria-barra-titulos.png" /></div><!-- fim box_mais_rel--> 
+  	</div><!-- fim #box_noticias-->
+ 	<div class="clearfix"></div>
+    <div id="box_recados_geral" style="display:none;">
+   		<img src="img/t-comentarios.jpg" class="fl" />
+     	<div id="box_conteudo_noticia"></div>
+   	</div>
+    </div><!-- fim #box_conteudo-->
+  <div class="clearfix"></div>
+  <div id="rodape1">
+<div id="rodape">
+  <div id="serv-menu"> <!-- INICIO DO MENU DE SERVICOS -->
+      <ul>
+      
+      <li ><a href="faleconosco.php" title="Fale Conosco"> <img src="img/rodape/serv-01.png" alt="Fale Conosco" /></a></li>
+      <li ><a href="central.php" title="Central do Assinante"> <img src="img/rodape/serv-02.png"  alt="Central do Assinante" /></a></li>
+      <li ><a href="assine.php" title="Assine"> <img src="img/rodape/serv-08.png"  alt="Assine" /></a></li>
+      <li ><a href="anuncie.php" title="Anuncie"> <img src="img/rodape/serv-03.png" alt="Anuncie" /></a></li>
+      <li ><a href="tem.php" title="Tem"> <img src="img/rodape/serv-07.png" alt="Twitter" /></a></li>
+      <li ><a href="politicapriv.php" title="Política de Privacidade"> <img src="img/rodape/serv-04.png" alt="Política de Privacidade" /></a></li>
+      <li ><a href="trabalhe.php" title="Trabalhe no Diário Online"> <img src="img/rodape/serv-05.png" alt="Trabalhe no DiárioOnLine"/></a></li>
+      
+      
+      
+      <div  class="clearfix"></div>
+     
+      </ul>
+  </div>
+  
+
+  
+  <!-- INICIO DO MENU DE CATEGORIAS -->
+       <div id="rod-catmenu"> 
+    <ul>
+     <li ><a href="categorias.php?nIdCategoria=1" title="Notícias"> NOTÍCIAS </a></li>
+     <li ><a href="categorias.php?nIdCategoria=2" title="Esporte"> ESPORTE </a></li>
+     <li ><a href="categorias.php?nIdCategoria=3" title="Você"> VOCÊ </a></li>
+     <li ><a href="comunidade.php" title="Comunidades" target="_blank"> COMUNIDADE </a></li>
+     <li ><a href="guia.php" title="Guia"> GUIA </a></li>
+     <li ><a href="galerias-capa.php" title="Galerias"> GALERIAS </a></li>
+     <li ><a href="http://shopping.diarioonline.com.br/" title="Shopping" target="_blank"> SHOPPING </a></li>
+  </ul></div>
+       
+       <!-- FIM DO MENU DE CATEGORIAS -->
+     
+       <!-- INICIO DO MENU DE SITES DO GRUPO RBA RODAPE -->
+  
+    <div id="busca-rod"><div id="busctitle">BUSCA</div><div id="busca-rodape">
+<form name="form" method="post" action="busca.php" id="topsrc" style="display:inline;">              
+  <div class="buscamarg1" style="margin-left:20px;"><input name="Buscar" type="text" class="buscafild" id="por" value="" size="20"  title=""/></div>
+  </form>
+				<!--<div class="tx_filtro"> Filtro:</div>
+        <select name="Filtro" class="filtro_rod">
+                	    <option class="f_cat">Todo site</option>
+                        <option class="f_cat cor_noticias">Noticias</option>
+                        <option class="f_subcat">Pará</option>
+                        <option class="f_subcat">Tecnologia</option>
+                        <option class="f_subcat">Mundo</option>
+                        <option class="f_subcat">Brasil</option>
+                        <option class="f_cat cor_esporte">Esportes</option>
+                        <option class="f_subcat">Automobilismo</option>
+                        <option class="f_subcat">Campeonato Paraense</option>
+                        <option class="f_subcat">Futebol</option>
+                        <option class="f_cat cor_voce">Você</option>
+                        <option class="f_subcat">Blogs</option>
+                        <option class="f_subcat">Games</option>
+                        <option class="f_subcat">Fofoca</option>
+                        <option class="f_subcat">Kids</option>
+                        <option class="f_subcat">Música</option>
+                        <option class="f_cat cor_galeria">Galerias</option>
+                        <option class="f_subcat">Áudios</option>
+                        <option class="f_subcat">Imagens</option>
+                        <option class="f_subcat">Vídeos</option>
+              	    </select>-->
+		<input type="image" src="img/busend.png" width="16" height="16"  alt="Busca" class="sendbutton" title="Buscar" onclick="document.forms['form'].submit(); return false;"/>
+
+        </div>
+
+    </div>
+    <div id="rba-bottom">
+  <ul>
+  <li><a href="http://www.radioclubedopara.com.br" target="_blank" title="Rádio Clube"><img src="img/mrba06.png" alt="Rádio Clube" /></a></li>
+  <li><a href="http://www.radiodiariofm.com.br/" target="_blank" title="Diário FM"><img src="img/mrba05.png" alt="Diário FM" /></a></li>
+  <li><a href="http://www.radio99.com.br/" target="_blank" title="99 FM"><img src="img/mrba04.png" alt="99 FM" /></a></li>
+  <li><a href="http://www.tvrba.com.br/" target="_blank" title="TV RBA"><img src="img/mrba03.png" alt="TV RBA" /></a></li>
+  <li><a href="http://www.diariodopara.com.br/" target="_blank" title="Diario do Pará"><img src="img/mrba02.png" alt="Diario do Pará" /></a></li>
+  <li><img src="img/mrba01.png" alt="RBA" /></li>
+  
+  </ul></div><!-- FIM DO MENU DE SITES DO GRUPO RBA RODAPE -->
+  
+<div class="clearfix"></div>
+
+
+    </div><!-- FIM DE #RODAPE -->
+  <div id="copyright"><a href="termos-gerais.php">Condições gerais de uso Diário Online</a> | © Copyright 2010 Diário Online</div>
+	<div id="lg-comtato"><a href="http://www.comtatodigital.com.br/" target="_blank"><img src="img/comtato.gif" /></a></div>
+ <div class="clearfix"></div>
+ <script type="text/javascript">
+
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-18490948-1']);
+ _gaq.push(['_setDomainName', '.diarioonline.com.br']);
+ _gaq.push(['_trackPageview']);
+
+ (function() {
+   var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+
+</script></div>
+</div><!-- fim #geral-->  
+</body>
+</html>

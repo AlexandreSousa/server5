@@ -1,0 +1,61 @@
+THUNDER CACHE é um sistema que trabalha em conjunto ao Squid, rescrevendo URLs e guardando arquivos para melhorar o desempenho do cache.
+Idelizado por Luiz Biazus (luiz@biazus.com)
+Programador:
+Rodrigo Manga (rodrigomanga@yahoo.com.br)
+
+
+A linha abaixo digitada no terminal, baixa e instala os programas e versões necessárias para a instalaçao do sistema no Ubuntu Server 8.04
+apt-get install squid apache2 php5 php5-cli 
+
+
+CONFIGURAÇÃO DO SQUID.CONF
+
+Adicione as seguintes linhas em seu squid.conf:
+
+#-----------------------------------------------
+#OPÇÕES DE REDIRECIONAMENTO
+
+url_rewrite_children 10
+acl store_rewrite_list dstdomain -i "/etc/squid/thunder.lst"
+url_rewrite_access allow store_rewrite_list
+url_rewrite_access deny all
+url_rewrite_program /etc/squid/loader.php 
+
+#nega cache local, para não haver duplicação
+acl localcache dstdomain ip_do_seu_servidor
+cache deny localcache
+#-----------------------------------------------
+
+Descompacte os arquivos no diretório /etc/squid/
+
+Com o pacote original de plugins, precisamos fazer alguns links simbólicos:
+
+ln -s /etc/squid/youtube.com.php /etc/squid/googlevideo.com.php
+ln -s /etc/squid/avg.com.php /etc/squid/grisoft.com.php
+
+Faça o link do thunder.php no diretório do apache:
+ln -s /etc/squid/thunder.php /var/www/thunder.php
+
+Crie o diretório que vai abrigar os arquivos e mude as permissões de acesso.
+
+mkdir /var/www/thunder
+chmod a+xrw -R /var/www/thunder
+chmod a+x /etc/squid/loader.php
+chmod a+x /etc/squid/downloader.php
+
+Verifique o arquivo /etc/squid/thunder.conf, e altere as configurações necessárias ($cache_size, $server_ip, etc) e reinicie o squid com o comando:
+
+squid -k reconfigure
+
+Agora deverá estar tudo funcionando!
+
+Acesse o relatório do thunder no seguinte endereço:
+http://localhost/thunder.php
+
+Se você teve algum problema, pergunte!
+
+Estou oferencendo consultoria, por um investimento justo com retorno rápido.
+É só entrar em contato.
+
+Rodrigo Manga <rodrigomanga@yahoo.com.br>
+

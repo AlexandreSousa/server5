@@ -1,0 +1,54 @@
+#!/bin/bash
+#fwstation activation by carlosxlinux@yahoo.com.br
+DEBUG="echo"
+LOCAL=`grep 'LOCAL=' /etc/fw.conf | cut -f 2 -d "="`
+ARCH=`grep 'ARCH=' /etc/fw.conf | cut -f 2 -d "="`
+WAN1=`grep 'WAN1=' /etc/fw.conf | cut -f 2 -d "="`
+WAN2=`grep 'WAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN1=`grep 'LAN1=' /etc/fw.conf | cut -f 2 -d "="`
+LAN2=`grep 'LAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN3=`grep 'LAN3=' /etc/fw.conf | cut -f 2 -d "="`
+
+for i in `cat $ARCH` ; do
+STATUS=`echo $i | cut -f 1 -d "|"`
+if [ $STATUS = "#" ]; then
+MACSOURCE=`echo $i | cut -f 2 -d "|"`
+CANAL=`echo $i | cut -f 3 -d "|"`
+USERS=`echo $i | cut -f 6 -d "|"`
+CBQ_US=`echo $i | cut -f 4 -d "|"`
+CBQ_VS=`echo $i | cut -f 5 -d "|"`
+iptables -t filter -A INPUT -s $CANAL -j DROP
+iptables -t filter -A INPUT -m mac --mac-source $MACSOURCE -j DROP
+iptables -A INPUT -s $CANAL -p tcp --dport 3128 -j DROP
+iptables -A INPUT -m mac --mac-source $MACSOURCE -p tcp --dport 3128 -j DROP
+TS="BLOQUEADO"
+else
+MACSOURCE=`echo $i | cut -f 1 -d "|"`
+CANAL=`echo $i | cut -f 2 -d "|"`
+USERS=`echo $i | cut -f 5 -d "|"`
+CBQ_US=`echo $i | cut -f 3 -d "|"`
+CBQ_VS=`echo $i | cut -f 4 -d "|"`
+iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -s $CANAL -m tcpmss --mss 1400:1536 -j TCPMSS --clamp-mss-to-pmtu
+iptables -A FORWARD -s $CANAL -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -t mangle -p tcp -s $CANAL --dport 22 -j TOS --set-tos Minimize-Delay
+iptables -A OUTPUT -t mangle -p tcp -s $CANAL --dport 80 -j TOS --set-tos Maximize-Throughput
+iptables -A OUTPUT -t mangle -p tcp -s $CANAL --dport 443 -j TOS --set-tos Maximize-Throughput
+iptables -A OUTPUT -t mangle -p tcp -s $CANAL --dport 3128 -j TOS --set-tos Maximize-Throughput
+
+iptables -A INPUT -s $CANAL -m mac --mac-source $MACSOURCE -j ACCEPT
+iptables -A INPUT -p tcp -s $CANAL -m mac --mac-source $MACSOURCE --dport 3128 -j ACCEPT
+iptables -t nat -A POSTROUTING -s $CANAL -j MASQUERADE
+iptables -t nat -A PREROUTING -i $LAN2 -s $CANAL -p tcp -m tcp --tcp-flags SYN,RST SYN -d ! "200.201.174.0" --dport 80 -j REDIRECT --to-port 3128
+iptables -t nat -A PREROUTING -i $LAN3 -s $CANAL -p tcp -m tcp --tcp-flags SYN,RST SYN -d ! "200.201.174.0" --dport 80 -j REDIRECT --to-port 3128
+iptables -t mangle -A PREROUTING -d $CANAL -m mac --mac-source $MACSOURCE -j MARK --set-mark 2
+
+TS="ABERTO"
+fi
+
+#$LOCAL/fwcbq $CBQ_US $CBQ_VS
+
+$DEBUG "$MACSOURCE - $CANAL - $USERS = $TS"
+
+done
+
+sync 

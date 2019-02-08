@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_lan" value="name:id;datatype:int,name:desc;datatype:string,name:eth;datatype:string" />
+	<infoitem key="UD_qr_vlan" value="name:id;datatype:int,name:id_eth;datatype:string,name:v_lan_ip;datatype:string" />
+</info>

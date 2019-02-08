@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_parametros" value="name:id;datatype:int,name:site;datatype:string,name:fone;datatype:string,name:time;datatype:string,name:ip1;datatype:string,name:ip2;datatype:string,name:ip3;datatype:string,name:ip4;datatype:string,name:p_proxy;datatype:string" />
+	<infoitem key="UD_qr_iface_net" value="name:id;datatype:int,name:desc;datatype:string,name:eth;datatype:string" />
+</info>

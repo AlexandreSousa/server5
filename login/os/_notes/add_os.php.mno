@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_open_os" value="name:id;datatype:int,name:solicitante;datatype:string,name:solicitado;datatype:string,name:problema;datatype:blob,name:data_abertura;datatype:date,name:hora_aberta;datatype:time,name:data_fechamento;datatype:date,name:hora_fecha;datatype:time,name:estatus;datatype:string" />
+	<infoitem key="UD_qr_users" value="name:id;datatype:int,name:id_cbq;datatype:string,name:id_cliente;datatype:string,name:mac;datatype:string,name:id_esec;datatype:string,name:id_auth;datatype:string,name:situacao;datatype:string,name:ip;datatype:string,name:login;datatype:string,name:senha;datatype:string,name:proxy;datatype:string,name:banda;datatype:string,name:site;datatype:string,name:msg;datatype:blob" />
+</info>

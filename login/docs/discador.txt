@@ -1,0 +1,31 @@
+EXPLICANDO A FUNCIONALIDADE
+
+Programa deve ser construido em deplhi/lazarus
+
+COMO FUNCIONA
+O programa ira se conectar a uma tabela do mysql no servidor e verificar um codigo gerado em uma determinada tabela
+apos a verificação ira pega o codigo e iseria em na tabela de logados permitindo assim a liberação do usuario a navegação
+
+Nesta tabela sera inserido o login e a senha do cliente mais o codigo 
+
+AGORA A MAGICA
+
+A cada 5 minutos o servidor ira gera uma nova chave 
+
+o programa em delphi devera verificar esta tabela a cada 30 segundos pegar o codigo gerado e iserir na tabela de logados
+
+
+
+O QUE DEVERA CONTER NA INTERFACE DO PROGRAMA CLIENTE
+
+Devera conter o login e senha do cliente
+
+Tambem devera ter um sistema de registro para o funcionamento do mesmo
+
+onde devera conter o numero de registro e a chave do hd do computador 
+
+A PARTE DO SERVIDOR
+
+O servidor ira compara os dados enviado pelo programa se tiverem ok o mesmo ira libera a navegação
+
+Apos a comparação e aliberação programa abre uma pagina do servidor a qual ira roda os scripts de liberação

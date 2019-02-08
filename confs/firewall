@@ -1,0 +1,37 @@
+#!/bin/bash
+#Firewall secure controled connect for iptables 
+
+case "$1" in
+ "start")
+echo "O fw esta sendo carregado"
+/var/www/server/bin/firewall.sh
+        ;;
+ "stop")
+/var/www/server/fwfine
+echo "O fw esta sendo desativado"
+        ;;
+  "restart")
+echo "O fw est� sendo reiniciado"
+/var/www/server/fwfine && /var/www/server/bin/firewall.sh
+        ;;
+  "status")
+iptables -L -n
+	;;
+  "cbq")
+$LOCAL/fwcbq
+	;;
+esac
+
+
+
+
+
+
+
+
+
+
+
+
+
+/var/www/server/bin/firewall.sh & 

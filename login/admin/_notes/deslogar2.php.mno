@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_logados" value="name:id;datatype:int,name:id_cliente;datatype:string,name:ip;datatype:string,name:mac;datatype:string,name:login;datatype:string,name:senha;datatype:string" />
+</info>

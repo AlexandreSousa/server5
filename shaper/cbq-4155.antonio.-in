@@ -1,0 +1,5 @@
+DEVICE=eth1,10Mbit,1Mbit
+RATE=128kbit
+WEIGHT=12kbit
+PRIO=5
+RULE=10.3.250.7

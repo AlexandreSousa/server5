@@ -1,0 +1,58 @@
+#!/bin/sh
+LAN1=eth2
+LAN2=eth3
+LIMITE=240
+CANAL=1
+MODE=10.3.
+MASK=255.255.255.0
+GWAY=
+
+vnet_start(){
+
+ifconfig $LAN1 $MODE.0.1 netmask 255.255.255.0 broadcast $MODE.0.1 up
+
+while [ "$CANAL" -lt "$LIMITE" ]
+do
+
+EXT=`expr $CANAL + 1000`
+
+ifconfig $LAN1:$EXT 10.3.$CANAL.1 netmask $MASK broadcast 10.3.$CANAL.3 up
+route add default gw $GWAY dev $LAN1:$EXT
+
+echo "Canal $CANAL iniciado..."
+
+CANAL=`expr $CANAL + 1`
+
+done
+
+}
+
+vnet_stop(){
+
+while [ "$CANAL" -lt "$LIMITE" ]
+do
+
+EXT=`expr $CANAL + 1000`
+
+ifconfig $LAN1:$EXT down
+
+echo "Canal $CANAL parado..."
+
+CANAL=`expr $CANAL + 1`
+
+done
+
+}
+
+case "$1" in
+start)
+vnet_start
+;;
+stop)
+vnet_stop
+;;
+restart)
+vnet_start
+vnet_stop
+;;
+esac

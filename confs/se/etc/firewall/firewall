@@ -1,0 +1,25 @@
+#!/bin/bash
+#Firewall secure controled connect for iptables 
+LOCAL=`grep 'LOCAL=' /etc/fw.conf | cut -f 2 -d "="`
+
+case "$1" in
+ "start")
+echo "O fw está sendo carregado"
+$LOCAL/fwinit
+        ;;
+ "stop")
+$LOCAL/fwfine
+echo "O fw está sendo desativado"
+        ;;
+  "restart")
+echo "O fw está sendo reiniciado"
+$LOCAL/fwfine && $LOCAL/fwinit
+        ;;
+  "status")
+iptables -L -n
+	;;
+  "cbq")
+$LOCAL/fwcbq
+	;;
+esac
+

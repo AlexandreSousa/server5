@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_RSMaclist" value="name:mac;datatype:string,name:ip;datatype:string,name:login;datatype:string" />
+</info>

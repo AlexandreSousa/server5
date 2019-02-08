@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_os_abetas" value="name:id;datatype:int,name:solicitante;datatype:string,name:solicitado;datatype:string,name:problema;datatype:blob,name:data_abertura;datatype:date,name:hora_aberta;datatype:time,name:data_fechamento;datatype:date,name:hora_fecha;datatype:time,name:estatus;datatype:string" />
+</info>

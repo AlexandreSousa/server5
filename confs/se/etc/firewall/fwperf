@@ -1,0 +1,17 @@
+#!/bin/bash
+
+LAN1=`grep 'LAN1=' /etc/fw.conf | cut -f 2 -d "="`
+LAN2=`grep 'LAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN3=`grep 'LAN3=' /etc/fw.conf | cut -f 2 -d "="`
+
+sync 
+# "Logar os pacotes mortos por inatividade ..."
+iptables -A FORWARD -m limit --limit 3/minute --limit-burst 3 -j LOG
+
+# Barrando forward entre as redes
+iptables -A FORWARD -i $LAN1 -o $LAN2 -j REJECT
+iptables -A FORWARD -i $LAN2 -o $LAN1 -j REJECT
+iptables -A FORWARD -i $LAN1 -o $LAN3 -j REJECT
+iptables -A FORWARD -i $LAN3 -o $LAN1 -j REJECT
+iptables -A FORWARD -i $LAN2 -o $LAN3 -j REJECT
+iptables -A FORWARD -i $LAN3 -o $LAN2 -j REJECT

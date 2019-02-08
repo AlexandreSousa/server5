@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_login" value="name:id;datatype:int,name:id_cbq;datatype:string,name:id_cliente;datatype:string,name:mac;datatype:string,name:situacao;datatype:string,name:ip;datatype:string,name:login;datatype:string,name:senha;datatype:string,name:proxy;datatype:string,name:banda;datatype:string,name:site;datatype:string,name:msg;datatype:blob" />
+</info>

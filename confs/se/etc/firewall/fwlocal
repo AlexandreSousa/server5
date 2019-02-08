@@ -1,0 +1,28 @@
+#!/bin/bash
+
+ARCH=`grep 'ARCH=' /etc/fw.conf | cut -f 2 -d "="`
+WAN1=`grep 'WAN1=' /etc/fw.conf | cut -f 2 -d "="`
+WAN2=`grep 'WAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN1=`grep 'LAN1=' /etc/fw.conf | cut -f 2 -d "="`
+LAN2=`grep 'LAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN3=`grep 'LAN3=' /etc/fw.conf | cut -f 2 -d "="`
+ADMIN1=`grep 'ADMIN1=' /etc/fw.conf | cut -f 2 -d "="`
+ADMIN2=`grep 'ADMIN2=' /etc/fw.conf | cut -f 2 -d "="`
+ADMIN3=`grep 'ADMIN3=' /etc/fw.conf | cut -f 2 -d "="`
+SSHPORT=`grep 'SSHPORT=' /etc/fw.conf | cut -f 2 -d "="`
+WMNPORT=`grep 'WMNPORT=' /etc/fw.conf | cut -f 2 -d "="`
+
+# "Abre uma porta"
+iptables -A INPUT -p tcp -s $ADMIN1 --dport $SSHPORT -j ACCEPT
+iptables -A INPUT -p tcp -s $ADMIN2 --dport $SSHPORT -j ACCEPT
+iptables -A INPUT -p tcp -s $ADMIN1 --dport $WMNPORT -j ACCEPT
+iptables -A INPUT -p tcp -s $ADMIN2 --dport $WMNPORT -j ACCEPT
+iptables -A INPUT -p tcp -s $ADMIN3 --dport $SSHPORT -j ACCEPT
+#iptables -A INPUT -p tcp --dport $SSHPORT -j DROP
+#iptables -A INPUT -p tcp --dport $WMNPORT -j DROP
+ 
+# "Abre para a interface de loopback."
+# Esta regra é essencial para o KDE e outros programas gráficos funcionarem adequadamente.
+iptables -A INPUT -p tcp -s 127.0.0.1 -j ACCEPT
+iptables -A INPUT -p udp -s 127.0.0.1 -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT

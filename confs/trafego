@@ -1,0 +1,4 @@
+# This is needed in order for the TIME parameter in /etc/shaper/cbq-* to
+# work.
+*/1 *    * * *   root    /var/www/server/banda/atualiza.sh
+ 

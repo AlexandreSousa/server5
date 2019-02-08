@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_cliente_ls" value="name:id;datatype:int,name:nome;datatype:string,name:endereco;datatype:string,name:referencia;datatype:string,name:cidade;datatype:string,name:uf;datatype:string,name:fonep;datatype:string,name:datanas;datatype:string,name:datacad;datatype:string,name:email;datatype:string,name:complemento;datatype:string,name:bairro;datatype:string,name:cep;datatype:string,name:cpfcnpj;datatype:string,name:ofone;datatype:string,name:obs;datatype:blob" />
+</info>

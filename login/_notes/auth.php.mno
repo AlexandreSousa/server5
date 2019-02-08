@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_cliente" value="name:id;datatype:int,name:id_cliente;datatype:string,name:mac;datatype:string,name:maclist;datatype:string,name:ip;datatype:string,name:login;datatype:string,name:senha;datatype:string,name:site;datatype:string" />
+	<infoitem key="UD_qr_desloga" value="name:id;datatype:int,name:ip;datatype:string,name:mac;datatype:string,name:login;datatype:string,name:senha;datatype:string" />
+	<infoitem key="UD_qr_user" value="name:id;datatype:int,name:ip;datatype:string,name:mac;datatype:string,name:login;datatype:string,name:senha;datatype:string" />
+	<infoitem key="UD_qr_parametros" value="name:id;datatype:int,name:site;datatype:string,name:fone;datatype:string,name:time;datatype:string,name:ip_server;datatype:string,name:p_proxy;datatype:string" />
+	<infoitem key="UD_RSUsuario" value="name:login;datatype:string,name:senha;datatype:string" />
+	<infoitem key="UD_RSMaclist" value="name:situacao;datatype:string,name:mac;datatype:string,name:ip;datatype:string,name:login;datatype:string" />
+	<infoitem key="UD_qr_ids_pega" value="name:id;datatype:int,name:id_cbq;datatype:string,name:id_cliente;datatype:string,name:mac;datatype:string,name:id_esec;datatype:string,name:id_auth;datatype:string,name:situacao;datatype:string,name:a_ip;datatype:string,name:ip;datatype:string,name:login;datatype:string,name:senha;datatype:string,name:proxy;datatype:string,name:banda;datatype:string,name:site;datatype:string,name:id_tempo;datatype:string,name:id_volume;datatype:string,name:msg;datatype:blob,name:cliente_f;datatype:string" />
+	<infoitem key="UD_qr_financeiro" value="name:id;datatype:int,name:UserName;datatype:string,name:cliente;datatype:string,name:tipo_documento;datatype:string,name:n_documento;datatype:string,name:n_parcela;datatype:string,name:valor;datatype:string,name:obs;datatype:string,name:emissao;datatype:date,name:vencimento;datatype:date,name:status;datatype:string,name:data_recebido;datatype:date" />
+</info>

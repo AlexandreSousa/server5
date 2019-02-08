@@ -1,0 +1,110 @@
+#!/bin/bash
+
+LOCAL=`grep 'LOCAL=' /etc/fw.conf | cut -f 2 -d "="`
+ARCH=`grep 'ARCH=' /etc/fw.conf | cut -f 2 -d "="`
+WAN1=`grep 'WAN1=' /etc/fw.conf | cut -f 2 -d "="`
+WAN2=`grep 'WAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN1=`grep 'LAN1=' /etc/fw.conf | cut -f 2 -d "="`
+LAN2=`grep 'LAN2=' /etc/fw.conf | cut -f 2 -d "="`
+LAN3=`grep 'LAN3=' /etc/fw.conf | cut -f 2 -d "="`
+CBQP=`grep 'CBQP=' /etc/fw.conf | cut -f 2 -d "="`
+in="_in"
+out="_out"
+COIN="2"
+COUT="3"
+
+# Apaga os arquivos do CBQ
+rm -f $CBQP/cbq-*
+
+# Inicia loop para cada linha do arquivo de clientes
+
+for i in `cat $ARCH` ; do
+STATUS=`echo $i | cut -f 1 -d "|"`
+if [ $STATUS = "#" ]; then
+MACSOURCE=`echo $i | cut -f 2 -d "|"`
+CANAL=`echo $i | cut -f 3 -d "|"`
+USERS=`echo $i | cut -f 5 -d "|"`
+CBQ_US=`echo $i | cut -f 4 -d "|"`
+else
+MACSOURCE=`echo $i | cut -f 1 -d "|"`
+CANAL=`echo $i | cut -f 2 -d "|"`
+USERS=`echo $i | cut -f 4 -d "|"`
+CBQ_US=`echo $i | cut -f 3 -d "|"`
+fi
+
+oct1="`echo $CANAL | cut -f1 -d.`"
+oct3="`echo $CANAL | cut -f3 -d.`"
+oct4="`echo $CANAL | cut -f4 -d.`"
+
+# Esquema para criar nomes únicos para os arquivos do CBQ
+if [ `echo $COIN|wc -c` = 2 ] ; then
+arq_cbq_in="cbq-000$COIN.$USERS$in";
+elif [ `echo $COIN|wc -c` = 3 ] ; then
+arq_cbq_in="cbq-00$COIN.$USERS$in";
+elif [ `echo $COIN|wc -c` = 4 ] ; then
+arq_cbq_in="cbq-0$COIN.$USERS$in";
+elif [ `echo $COIN|wc -c` = 5 ] ; then
+arq_cbq_in="cbq-$COIN.$USERS$in"; fi
+if [ `echo $COUT|wc -c` = 2 ] ; then
+arq_cbq_out="cbq-000$COUT.$USERS$out";
+elif [ `echo $COUT|wc -c` = 3 ] ; then
+arq_cbq_out="cbq-00$COUT.$USERS$out";
+elif [ `echo $COUT|wc -c` = 4 ] ; then
+arq_cbq_out="cbq-0$COUT.$USERS$out";
+elif [ `echo $COUT|wc -c` = 5 ] ; then
+arq_cbq_out="cbq-$COUT.$USERS"; fi
+
+# Cria o arquivo de download do CBQ com os valores do USERS
+cat > $CBQP/$arq_cbq_in << EOF
+DEVICE=$LAN1,10Mbit,1Mbit
+RATE=$[$CBQ_US]Kbit
+WEIGHT=$[$CBQ_US/10]Kbit
+PRIO=5
+RULE=$CANAL
+MARK=1$oct3$oct4
+BOUNDED=yes
+ISOLATED=yes
+
+cat > $CBQP/$arq_cbq_in << EOF
+DEVICE=$LAN3,10Mbit,1Mbit
+RATE=$[$CBQ_US]Kbit
+WEIGHT=$[$CBQ_US/10]Kbit
+PRIO=5
+RULE=$CANAL
+MARK=1$oct3$oct4
+BOUNDED=yes
+ISOLATED=yes
+EOF
+
+# Cria o arquivo de upload do CBQ com os valores do CLIENTE
+cat > $CBQP/$arq_cbq_out.$LAN << EOF
+DEVICE=$WAN1,10Mbit,1Mbit
+RATE=$[$CBQ_US]Kbit
+WEIGHT=$[$CBQ_US/10]Kbit
+PRIO=5
+RULE=$CANAL,
+MARK=1$oct3$oct4
+BOUNDED=yes
+ISOLATED=yes
+EOF
+
+# Cria o arquivo de upload do CBQ com os valores do CLIENTE
+cat > $CBQP/$arq_cbq_out.$LAN << EOF
+DEVICE=$WAN2,10Mbit,1Mbit
+RATE=$[$CBQ_US]Kbit
+WEIGHT=$[$CBQ_US/10]Kbit
+PRIO=5
+RULE=$CANAL,
+MARK=1$oct3$oct4
+BOUNDED=yes
+ISOLATED=yes
+EOF
+
+# Incremente em dois o valor das variáveis COIN e COUT
+let COIN=COIN+2
+let COUT=COUT+2
+
+done
+
+service cbq stop
+service cbq start

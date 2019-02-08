@@ -1,0 +1,32 @@
+<?php require_once('Connections/bancoSolidario.php'); ?>
+
+
+<?php 
+$estado = $_POST['uf'];
+
+//echo '<option value="0">'.$minha_cidade.'</option>';
+
+
+echo '<option value="0">Selecione uma cidade</option>';
+
+$seleciona_cidade = mysql_query("SELECT * FROM tb_cidades WHERE estado = '$estado'"); 
+   if(mysql_num_rows($seleciona_cidade) <= '0') {
+   echo '<option value="0">Nenhuma cidade disponivel</option>';
+   } else {
+   while($cidades = mysql_fetch_array($seleciona_cidade)) {
+   $id_cidades = $cidades['id'];
+   $cidades = $cidades['nomeCidade'];
+  
+     
+	  	 
+
+echo '<option value="'.$id_cidades.'">'.$cidades.'</option>';
+
+
+
+}
+
+}
+
+
+?>

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# "Bloqueia programas P2P"
+# "iMesh"
+iptables -A FORWARD -d 216.35.208.0/24 -j DROP
+# "BearShare"
+iptables -A FORWARD -p tcp --dport 6346 -j DROP
+iptables -A FORWARD -p udp --dport 6346 -j DROP
+# "ToadNode"
+iptables -A FORWARD -p tcp --dport 6346 -j DROP
+iptables -A FORWARD -p udp --dport 6346 -j DROP
+# "WinMX"
+iptables -A FORWARD -d 209.61.186.0/24 -j DROP
+iptables -A FORWARD -d 64.49.201.0/24 -j DROP
+# "Napigator"
+iptables -A FORWARD -d 209.25.178.0/24 -j DROP
+# "Morpheus"
+iptables -A FORWARD -d 206.142.53.0/24 -j DROP 
+iptables -A FORWARD -p tcp --dport 1214 -j DROP
+iptables -A FORWARD -p udp --dport 1214 -j DROP
+# "KaZaA"
+iptables -A FORWARD -d 213.248.112.0/24 -j DROP
+iptables -A FORWARD -p tcp --dport 1214 -j DROP
+iptables -A FORWARD -p udp --dport 1214 -j DROP
+iptables -A INPUT -m string --string "X-Kazaa" -j DROP
+iptables -A INPUT -m string --string "msn" -j DROP
+iptables -A FORWARD -p tcp -m string --string X-Kazaa-Username: -j REJECT --reject-with tcp-reset
+# "Limewire"
+iptables -A FORWARD -p tcp --dport 6346 -j DROP
+# "Audiogalaxy"
+iptables -A FORWARD -d 64.245.58.0/23 -j DROP

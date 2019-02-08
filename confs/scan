@@ -1,0 +1,4 @@
+# This is needed in order for the TIME parameter in /etc/shaper/cbq-* to
+# work.
+*/2 *    * * *   root    /var/www/server/bin/scan.sh
+ 

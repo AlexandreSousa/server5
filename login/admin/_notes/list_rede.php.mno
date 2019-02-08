@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_rede" value="name:id;datatype:int,name:desc;datatype:string,name:eth;datatype:string" />
+	<infoitem key="UD_qr_inernet" value="name:id;datatype:int,name:desc;datatype:string,name:eth;datatype:string" />
+	<infoitem key="UD_Recordset1qr_local" value="name:id;datatype:int,name:desc;datatype:string,name:eth;datatype:string" />
+	<infoitem key="UD_Recordset1qr_vlan" value="name:id;datatype:int,name:id_eth;datatype:string,name:v_lan_ip;datatype:string,name:mask;datatype:string" />
+</info>

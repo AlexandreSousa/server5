@@ -1,0 +1,132 @@
+#!/bin/bash
+#
+# Script que utiliza menu de opcoes em dialog
+# Carlos Carvalho <alexandresousa2005@yahoo.com.br>
+
+# Impede control+c
+trap 2 exit
+while : ; do
+
+# Menu de Opcoes
+  clear
+
+TXT=$(cat /home/user/menu.sistema-x2)
+opcao=`dialog --stdout --backtitle "SISTEMA SISTEMA-X           ALEXANDRESOUSA &UNIAOMAKER CONFIGURACAO DO SQUID" --menu "$serv SISTEMA-X" 0 80 10 \
+0 "Sair da configuracao do squid(sair)" \
+1 "Editar a lista dos proibidos" \
+2 "Libera ou bloquear quem pode acessar os proibidos" \
+3 "Editar os usuarios do sarg (aparece nos relatorios)" \
+4 "Gera relatorios do sarg" \
+9 "Fale conosco"`
+
+case $opcao in 
+	0)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "A cada dia estamos trabalhando para melhorar o nosso Saistema SISTEMA-X"
+      echo
+      echo
+      exit
+	;;
+	1)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "o SISTEMA-X ON-LINE ira abrir a lista de sites proibidos para edicao"
+     dialog --msgbox "insira a palavra a ser bloqueada e o site que contenha a palavra sera barrada ate que seja desbloqueada" 0 0
+      sleep 2
+      cd /etc/squid/clientes
+      sudo mcedit proibidos
+      sudo service squid reload
+      echo "Lista de proibidos editada con sucesso"
+      sleep 2
+      echo
+      echo
+      cache 
+	;;
+	2)
+      # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      dialog --msgbox "O SISTEMA-X ira abrir o arquivo livclientes o mac que estiver cadastrado tera acesso aos sites que estao na lista de proibidos "  0 0
+      sleep 2
+      clear
+      cd /etc/squid/clientes
+      sudo mcedit livclientes
+      sudo service squid reload
+      echo "livclientes editada con sucesso"
+      sleep 1
+      echo
+      echo
+       	;;
+ 	3)
+     clear
+     echo "SISTEMA-X ASP"
+     echo "========="
+     echo " "
+     dialog --msgbox  "irei abrir o arquivo para voce cadastrar os usuario no sarg " 0 0
+     cd /etc/squid
+     sudo mcedit sarg.usertab    
+	;;
+ 	4)
+      clear
+      echo "SISTEMA-X Gerando relatorio do sarg" 
+      echo "====="
+      echo " "
+      sudo sarg
+      echo " "
+      dialog --msgbox "Relatorio gerado" 0 0  
+      dialog --msgbox "Abra o seu navegador de internet e acesse o ip do servidor" 0 0
+      dialog --msgbox "Exemplo http://127.0.0.1/squid-reports mais lembre de trocar o ip pelo ip do seu servidor" 0 0 
+	;;                 
+  	8)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo " "
+      echo "Esta opcao permite a execucao de teste de performance e comunicacao"
+      echo "entre o SERVIDOR SISTEMA-X ASP e seu micro."
+      echo "Sera transferido um arquivo com 2 milhoes de caracteres, permitindo"
+      echo "a avaliacao do tempo de transmissao, e a comparacao com outros sistemas"
+      echo "  "
+      echo "Acione Enter para inicar - Podera levar varios minutos"
+      read nada
+      clear
+      inicio=`date`
+      cat /etc/msg/teste_tx
+      fim=`date`
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo " "
+      echo "Inicio as " $inicio
+      echo "Termino as " $fim
+      echo "  "
+      cat /etc/msg/teste_tx_tab
+      echo "  "
+      echo "Acione Enter"
+      read nada
+	;;
+	9)
+     # Sistema SISTEMA-X
+      clear
+dialog --msgbox "Sistema SISTEMA-X
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Telefone : (93) 3552-1386
+Segunda a sexta - 09:00 as 18:00
+Email : alexandre@uniaomaker.com.br
+Home Page : http://www.uniaomaker.com.br" 0 0
+      ;;
+esac
+done

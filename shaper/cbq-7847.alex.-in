@@ -1,0 +1,5 @@
+DEVICE=eth5,10Mbit,1Mbit
+RATE=128kbit
+WEIGHT=12kbit
+PRIO=5
+RULE=192.168.1.39

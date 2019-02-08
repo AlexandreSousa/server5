@@ -1,0 +1,729 @@
+#!/bin/bash
+#
+#    cbq.init v0.6.2
+#    Copyright (C) 1999  Pavel Golubev <pg@ksi-linux.com>
+#
+#    chkconfig:   2345 11 89
+#    description: sets up CBQ traffic control and filters
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#    You can always get the latest version from 
+#
+#  ftp://ftp.equinox.gu.net/pub/linux/cbq/cbq.init
+#
+#
+# VERSION HISTORY
+# ---------------
+# v0.6.2- Catalin Petrescu <taz@dntis.ro>
+#   - added tunnels interface handling
+# v0.6.1- Pavel Golubev <pg@ksi-linux.com>
+#   - added sch_prio module loading 
+#           (thanks johan@iglo.virtual.or.id for reminding)
+#   - resolved errors resulting from stricter syntax checking in bash2
+# - Lubomir Bulej <pallas@kadan.cz>
+#   - various cosmetic fixes
+# v0.6 - Lubomir Bulej <pallas@kadan.cz>
+#   - attempt to limit number of processes spawned by 
+#     utilizing more of sed power (use sed instead of grep/cut)
+#   - simplified TIME parser, using bash builtins
+#   - added initial support for SFQ as leaf qdisc
+#   - reworked the documentation part a little
+#   - incorporated pending patches and ideas submitted by the
+#     following people for versions 0.3 into version 0.6
+# - Miguel Freitas <miguel@cetuc.puc-rio.br>
+#   - in case of overlapping TIME parameters, the last match is taken
+# - Juanjo Ciarlante <jjo@mendoza.gov.ar>
+#   - chkconfig tags, list + stats startup parameters
+#   - optional tc & ip command logging (into /var/run/cbq-*)
+# - Rafal Maszkowski <rzm@icm.edu.pl>
+#   - PEAK parameter for setting TBF's burst peak rate
+#   - fix for many config files (use find instead of ls)
+# v0.5.1- Lubomir Bulej <pallas@kadan.cz>
+#   - fixed little but serious bug in RULE parser
+# v0.5 - Lubomir Bulej <pallas@kadan.cz>
+#   - added options PARENT, LEAF, ISOLATED and BOUNDED. This allows 
+#     (with some attention to config file ordering) for creating 
+#     hierarchical structures of shapers with classes able (or unable)
+#     to borrow bandwidth from their parents.
+#   - class ID check allows hexadecimal numbers
+#   - rewritten & simplified RULE parser
+#   - cosmetic changes to improve readability
+#   - reorganization to avoid duplicate code (timecheck etc.)
+#   - timecheck doesn't check classes without TIME fields anymore
+# v0.4  - Lubomir Bulej <pallas@kadan.cz>
+#   - small bugfix in RULE parsing code
+#   - simplified configuration parsing code
+#   - several small cosmetic changes
+#   - TIME parameter can be now specified more than once allowing you to 
+#     differentiate RATE throughout the whole day. Time overlapping is
+#     not checked, first match is taken. Midnight wrap (eg. 20:00-6:00)
+#     is allowed and taken care of.
+# v0.3a4- fixed small bug in IF operator. Thanks to 
+#         Rafal Maszkowski <rzm@icm.edu.pl>
+# v0.3a3- fixed grep bug when using more than 10 eth devices. Thanks to David
+#         Trcka <trcka@poda.cz>.
+# v0.3a2- fixed bug in "if" operator. Thanks kad@dgtu.donetsk.ua.
+# v0.3a - added TIME parameter. Example: TIME=00:00-19:00;64Kbit/6Kbit
+#         So, between 00:00 and 19:00 the RATE will be 64Kbit.
+#         Just start "cbq.init timecheck" periodically from cron 
+#   (every 10 minutes for example). DON'T FORGET though, to run
+#         "cbq.init start" for CBQ to initialize.
+# v0.2  - Some cosmetic changes. Now it is more compatible with old bash 
+#         version. Thanks to Stanislav V. Voronyi <stas@cnti.uanet.kharkov.ua>.
+# v0.1  - First public release
+#
+# 
+# README
+# ------
+# 
+# First of all - this is just a SIMPLE EXAMPLE of CBQ power.
+# Don't ask me "why" and "how" :)
+# 
+# This is an example of using CBQ (Class Based Queueing) and policy-based
+# filter for building smart ethernet shapers. All CBQ parameters are
+# correct for Linux ETHERNET (eth0,1,2..) interfaces only! It works for
+# ARCNET too (just set bandwidth parameter to 2Mbit). It was tested
+# on 2.1.125-2.1.129 linux kernels (KSI linux, Nostromo version) and 
+# ip-route utility by Alexey Kuznetsov (iproute2-ss981101 version). 
+# You can download ip-route from ftp://ftp.inr.ac.ru/ip-routing or
+# get iproute2*.rpm (compiled with glibc) from ftp.ksi-linux.com.
+# 
+# 
+# HOW DOES IT WORK?
+# -----------------
+# 
+# Every shaper must be described by config file in $CBQ_PATH directory
+# (/etc/sysconfig/cbq by default) - one file per shaper/class.
+#
+# The config file names must obey mandatory format: cbq-<clsid>.<name>
+# where <clsid> is two-byte hexadecimal number in range <0002-FFFF>, which 
+# is really a CBQ class ID and <name> is the name of the shaper - any text.
+# For small amount of shapers it is convenient to let <clsid> resemble 
+# shaper's speed.
+#
+# Example of valid config name: cbq-1280.My_first_shaper
+#
+#
+# The configuration file may contain the following parameters:
+#
+### Device parameters
+#
+# DEVICE=<ifname>,<bandwidth>,<weight>  mandatory
+# DEVICE=eth0,10Mbit,1Mbit
+#
+# <ifname> is the name of the interface you want to control
+#  traffic on, e.g. eth0
+# <bandwidth> is the physical bandwidth of the device, e.g. for
+#  ethernet 10Mbit or 100Mbit, for arcnet 2Mbit
+# <weight> is tuning parameter that should be proportional to
+#  <bandwidth>. As a rule of thumb: <weight> = <bandwidth> / 10
+#
+# When you have more classes on one interfaces, it is enough
+# to specify <bandwidth> and <weight> only once, therefore
+# in other files you can have just DEVICE=<ifname>.
+#
+### Class parameters
+#
+# RATE=<speed>     mandatory
+# RATE=5Mbit
+#
+# Bandwidth allocated to class - limiting speed of the shaper.
+# You can use Kbit, Mbit or bps, Kbps, Mbps as suffixes.
+#
+# WEIGHT=<speed>     mandatory
+# WEIGHT=500Kbit
+#
+# Tuning parameter that should be proportional to RATE. As a rule
+# of thumb: WEIGHT = RATE / 10
+#
+# PRIO=<1-8>     mandatory
+# PRIO=5
+#
+# Priority of class traffic. The higher the number, the lesser
+# the priority. Priority of 5 is just fine.
+#
+# PARENT=<clsid>    optional, default not set
+# PARENT=1280
+#
+# Specifies the ID of parent class you want to attach the CBQ
+# class to. You might want to use LEAF=none for the parent class
+# as mentioned below. By using this parameter and carefully 
+# ordering the configuration files it is possible to create
+# hierarchical structures of CBQ classes. The ordering is 
+# important so that parent classes are constructed before
+# their children.
+#
+# LEAF=none|tbf     optional, default "tbf"
+#
+# Instructs the script to attach leaf queueing discipline to CBQ class.
+# By default, TBF is used. This parameter is useful for parent classes
+# where you probably want to specify LEAF=none. In future it might be
+# possible to use SFQ or CBQ (or other) as leaf qdisc.
+# 
+# BOUNDED=yes|no    optional, default "yes"
+#
+# If set to "yes", the class cannot borrow bandwidth from its
+# parent in overlimit situation. If set to "no", the class will be
+# able to borrow bandwidth from its parent class.
+#
+# ISOLATED=yes|no    optional, default "no"
+#
+# If set to "yes", the class will not lend unused bandwidth to 
+# its children.
+#
+### TBF qdisc parameters
+#
+# BUFFER=<bytes>[/<bytes>]   optional, default "10Kb/8"
+#
+# This parameter controls the depth of the token bucket. In other
+# words it represents the maximal burst size the class can send.
+# The optional part of parameter is used to determine the length
+# of intervals in packet sizes, for which the transmission times
+# are kept.
+#
+# LIMIT=<bytes>     optional, default "15Kb"
+#
+# This parameter determines the maximal length of backlog. If
+# the queue contains more data than specified by LIMIT, the
+# newly arriving packets are dropped. The length of backlog
+# determines queue latency in case of congestion.
+#
+# PEAK=<speed>     optional, default not set
+#
+# Maximal peak rate for short-term burst traffic. This allows you
+# to control the absolute peak rate the class can send at, because
+# single TBF that allows 256Kbit/s would of course allow rate of
+# 512Kbit for half a second or 1Mbit for quarter of a second.
+#
+# MTU=<bytes>       optional, default "1500" 
+#
+# Maximum number of bytes that can be sent at once. This parameter
+# is required when you specify PEAK parameter. It defaults to MTU 
+# of ethernet - for other media types you might want to change it.
+#
+### SFQ qdisc parameters
+#
+# QUANTUM=<bytes>    optional, default not set
+#
+# This parameter should not be set lower than link MTU.
+#
+# PERTURB=<seconds>    optional, default not set
+#
+### Filter parameters
+#
+# RULE=[[saddr[/prefix]][:port],][daddr[/prefix]][:port]
+#
+# Those parameters make up u32 filter rules that select traffic for
+# each of the classes. You can use multiple RULE fields per config.
+#
+# Some examples:
+#
+# RULE=10.1.1.0/24:80
+#  selects traffic going to port 80 in network 10.1.1.0 
+#
+# RULE=10.2.2.5
+#  selects traffic going to any port on single host 10.2.2.5
+#
+# RULE=:25,10.2.2.128/26:5000
+#  selects traffic going from anywhere on port 50 to 
+#  port 5000 in network 10.2.2.128
+#
+# RULE=10.5.5.5:80,
+#  selects traffic going from port 80 of single host 10.5.5.5
+#
+### Time ranging parameters
+#
+# TIME=<from>-<to>;<rate>/<weight>[/<peak>] optional
+# TIME=18:00-06:00;256Kbit/25Kbit
+#
+# This parameter allows you to differentiate the class bandwidth
+# throughout the day. You can specify multiple TIME parameters, if
+# the times overlap, last match is taken. The fields <rate>, <weight>
+# and <peak> correspond to parameters RATE, WEIGHT and PEAK (which
+# is optional and applies for TBF qdisc only).
+#
+###
+#
+# Sample configuration file: cbq-1280.My_first_shaper
+#
+# --------------------------------------------------------------------------
+# DEVICE=eth0,10Mbit,1Mbit
+# RATE=128Kbit
+# WEIGHT=10Kbit
+# PRIO=5
+# RULE=192.128.1.0/24
+# --------------------------------------------------------------------------
+# 
+# The configuration says, that we will control traffic on 10Mbit ethernet
+# device eth0 and the traffic going to network 192.168.1.0 will be 
+# processed with priority 5 and shaped to rate of 128Kbit.
+#
+# Note that you can of course control outgoing traffic only. If you
+# want to control traffic in both directions, you must set up CBQ
+# for both interfaces.
+#
+# Consider the following example:
+# 
+#                    +---------+      192.168.1.1
+# BACKBONE -----eth0-|  linux  |-eth1------*-[client]
+#                    +---------+
+# 
+# Imagine you want to shape traffic from backbone to the client to
+# 28Kbit and traffic in the opposite direction to 128Kbit. You need
+# to setup shapers on both eth0 and eth1 interfaces, thus you need
+# two config files:
+#
+# cbq-28.backbone-client
+# --------------------------------------------------------------------------
+# DEVICE=eth1,10Mbit,1Mbit
+# RATE=28Kbit
+# WEIGHT=2Kbit
+# PRIO=5
+# RULE=192.168.1.1
+# --------------------------------------------------------------------------
+#
+# cbq-128.client-backbone
+# --------------------------------------------------------------------------
+# DEVICE=eth0,10Mbit,1Mbit
+# RATE=128Kbit
+# WEIGHT=10Kbit
+# PRIO=5
+# RULE=192.168.1.1,
+# --------------------------------------------------------------------------
+#
+# Pay attention to comma "," in the RULE field - it is source address!
+#
+# Enjoy.
+#
+#############################################################################
+
+PATH="/bin:/sbin:/usr/bin:/usr/sbin"
+CBQ_PATH="/etc/cbq"
+
+### Uncomment for debugging
+#LOG_FILE="/var/run/cbq-$1"
+
+if [ -n "$LOG_FILE" ]; then
+ ### Initialize log file
+ echo "# `date`" > $LOG_FILE
+
+ ### Logging equivalent of "ip" command
+ ip () {
+  [ -z "$LOG_FILE" ] && { /sbin/ip "$@"; return; }
+  echo -e "\nip $@\n" >> $LOG_FILE
+  /sbin/ip "$@" 2>&1 | tee -a $LOG_FILE
+ } # ip
+
+ ### Logging equivalent of "tc" command
+ tc () {
+  [ -z "$LOG_FILE" ] && { /sbin/tc "$@"; return; }
+  echo -e "\ntc $@\n" >> $LOG_FILE
+  /sbin/tc "$@" 2>&1 | tee -a $LOG_FILE
+ } # tc
+fi # command logging
+
+### Remove CBQ from all devices
+cbq_off () {
+ for dev in `ip link| sed -n '/^[0-9]/ { s/^[0-9]\+: \([a-z0-9]\+\)[:@].*/\1/; p; }'`; do
+  cbq_device_off $dev
+ done
+ return
+} # cbq_off
+
+### Remove root class from device $1
+cbq_device_off () {
+ tc qdisc del dev $1 root &>/dev/null
+ return
+} # cbq_device_off
+
+### Display CBQ setup
+cbq_show () {
+ for dev in $DEVICES; do
+  echo ---[ $dev: configured classes ]---------------------------
+  echo; tc $1 class show dev $dev; echo
+  
+  echo ---[ $dev: queueing disciplines ]-------------------------
+  echo; tc $1 qdisc show dev $dev; echo
+ done
+} # cbq_show
+
+### Check configuration and load DEVFIELDS/CLASSLIST
+cbq_init () {
+
+ ### Check configuration in $CBQ_PATH directory and get CLASSLIST
+ CLASSLIST=`find $CBQ_PATH -name 'cbq-*' -maxdepth 1 -printf "%f\n"| sort`
+ if [ -z "$CLASSLIST" ]; then
+  echo "**CBQ: not configured in $CBQ_PATH!"
+  exit
+ fi
+
+ ### Collect all DEVICE fields from $CBQ_PATH/cbq-*
+ DEVFIELDS=`find $CBQ_PATH -name 'cbq-*' -maxdepth 1 -exec sed -ne\
+     's/#.*//; s/ //g; /^DEVICE=.*,.*,.*/ { s/.*=//; p; q; }; \
+     /^DEVICE=/ q' {} \;| sort -u`
+
+ ### Check if there are any devices to set up
+ if [ -z "$DEVFIELDS" ]; then
+  echo "**CBQ: can't find any DEVICE field in $CBQ_PATH/cbq-*!"
+  exit
+ fi
+
+ ### Extract all device names from DEVICE fields in $CBQ_PATH/cbq-*
+ DEVICES=`echo "$DEVFIELDS"| sed 's/,.*//'| sort -u`
+   
+ ### Check for multiple devices with different DEVICE fields
+ if [ `echo "$DEVICES"| wc -l` -ne `echo "$DEVFIELDS"| wc -l` ]; then
+  echo "**CBQ: multiple different DEVICE fields for one device found!"
+  echo "$DEVFIELDS"
+  exit
+ fi
+} # cbq_init
+
+### Load class configuration from file $1
+cbq_load_class () {
+ CNAME="$CBQ_PATH/$1"
+ CFILE=`sed -e 's/#.*//; s/ //g; /^$/ d' $CNAME`
+ 
+ CLASS=`echo $1| sed 's/^cbq-0*//; s/\..*//'`
+ if [ `/usr/bin/printf "%d" 0x$CLASS` -le 1 ]; then
+  echo "**CBQ: class ID of $1 must be > 1!"
+  cbq_off
+  exit
+ fi
+ 
+ ### Device parameters 
+ DEVICE=`echo "$CFILE"| sed -n '/^DEVICE=/ { s/.*=//; s/,.*//; p; q; }'`
+ BANDWIDTH=`echo "$DEVFIELDS"| sed -n "/^$DEVICE,/ { s/.*,\(.*\),.*/\1/; p; q; }"`
+ 
+ ### Class parameters
+ CLASSID="1:$CLASS"
+ PARENT=`echo "$CFILE"| sed -n '/^PARENT=/ { s/.*=0*//; p; q; }'`
+ [ -z "$PARENT" ] && PARENT="1:1" || PARENT="1:$PARENT"
+ 
+ LEAF=`echo "$CFILE"| sed -n '/^LEAF=/ { s/.*=//; p; q; }'`
+ [ -z "$LEAF" ] && LEAF="tbf"
+ 
+ BOUNDED=`echo "$CFILE"| sed -n '/^BOUNDED=/ { s/.*=//; p; q; }'`
+ [ "$BOUNDED" = "no" ] && BOUNDED="" || BOUNDED="bounded"
+ 
+ ISOLATED=`echo "$CFILE"| sed -n '/^ISOLATED=/ { s/.*=//; p; q; }'`
+ [ "$ISOLATED" = "yes" ] && ISOLATED="isolated" || ISOLATED=""
+ 
+ PRIO=`echo "$CFILE"| sed -n '/^PRIO=/ { s/.*=//; p; q; }'`
+ RATE=`echo "$CFILE"| sed -n '/^RATE=/ { s/.*=//; p; q; }'`
+ WEIGHT=`echo "$CFILE"| sed -n '/^WEIGHT=/ { s/.*=//; p; q; }'`
+ if [ -z "$RATE" -o -z "$WEIGHT" -o -z "$PRIO" ]; then
+  echo "**CBQ: missing RATE, WEIGHT or PRIO field(s) in $1!"
+  cbq_off
+  exit
+ fi
+
+ ### Leaf qdisc parameters for TBF
+ if [ "$LEAF" = "tbf" ]; then
+  BUFFER=`echo "$CFILE"| sed -n '/^BUFFER=/ { s/.*=//; p; q; }'`
+  [ -z "$BUFFER" ] && BUFFER="10Kb/8"
+ 
+  LIMIT=`echo "$CFILE"| sed -n '/^LIMIT=/ { s/.*=//; p; q; }'`
+  [ -z "$LIMIT" ] && LIMIT="15Kb"
+  
+  PEAK=`echo "$CFILE"| sed -n '/^PEAK=/ { s/.*=//; p; q; }'`
+  [ -n "$PEAK" ] && PEAK="peakrate $PEAK"
+  
+  MTU=`echo "$CFILE"| sed -n '/^MTU=/ { s/.*=//; p; q; }'`
+  [ -z "$MTU" ] && MTU="1500"
+ elif [ "$LEAF" = "sfq" ]; then
+  PERTURB=`echo "$CFILE"| sed -n '/^PERTURB=/ { s/.*=//; p; q; }'`
+  [ -n "$PERTURB" ] && PERTURB="perturb $PERTURB"
+  
+  QUANTUM=`echo "$CFILE"| sed -n '/^QUANTUM=/ { s/.*=//; p; q; }'`
+  [ -n "$QUANTUM" ] && QUANTUM="quantum $QUANTUM"
+ elif [ "$LEAF" = "cbq" ]; then
+  echo "**CBQ: class $1, leaf qdisc CBQ not yet supported!" 
+ fi
+ 
+ return 0
+} # cbq_load_class
+
+
+### Check if ip-route is installed
+if [ ! -f /sbin/tc -o ! -f /sbin/ip ]; then
+ echo "**CBQ: ip-route2 utilities not installed!"
+ exit
+fi
+
+
+########################################################################
+# See how were we called                                               #
+########################################################################  
+
+case "$1" in
+
+ ### START ###
+ start)
+
+### If you have cbq, tbf and u32 compiled into kernel, comment it out
+for module in sch_cbq sch_tbf sch_sfq sch_prio cls_u32; do
+        if ! modprobe $module; then
+  echo "**CBQ: could not load module $module"
+  exit
+        fi
+done
+
+
+########################################################################
+# Get all devices from configuration files $CBQ_PATH/cbq-*             #
+# and setup CBQ root classes for them (if it is possible).             #
+########################################################################  
+
+### Load DEVICES, DEVFIELDS and CLASSLIST
+cbq_init
+
+### Try to discover interface bandwidth from DEVICE
+### field and if OK - setup root class for this one
+ 
+for dev in $DEVICES; do
+ ### Retrieve device bandwidth and weight
+ DEVTEMP=`echo "$DEVFIELDS"| sed -n "/^$dev,/ { s/.*,\(.*\),\(.*\)/\1,\2/; p; q; }"`
+ DEVBWDT=${DEVTEMP%%,*}
+ DEVWGHT=${DEVTEMP##*,}
+ 
+ ### If correctly set and the device is up, setup root class
+ if [ -n "$DEVBWDT" -a -n "$DEVWGHT" ]; then
+  if ! ip link | grep -q "$dev[:@].*UP"; then
+   echo "**CBQ: could not find device $dev! CBQ turned off."
+   cbq_off
+   exit
+  fi
+
+  ### Remove old root class from device
+  cbq_device_off $dev
+
+  ### Setup root class (queueing discipline) for device
+  tc qdisc add dev $dev root handle 1:0 cbq \
+  bandwidth $DEVBWDT avpkt 1000 cell 8
+
+  ### Create parent class :1. Every shaper will use it as 
+  ### parent unless specified otherwise using PARENT=xxxx
+  tc class add dev $dev parent 1:0 classid 1:1 cbq \
+  bandwidth $DEVBWDT rate $DEVBWDT weight $DEVWGHT \
+  prio 8 allot 1514 cell 8 maxburst 20 avpkt 1000
+ else
+  echo "**CBQ: could not determine bandwidth or weight for device $dev!"
+  echo "**CBQ: setup DEVICE field properly!"
+  exit
+ fi
+done # device
+
+
+#######################################################################
+# Set up all classes described in $CBQ_PATH/cbq-*                     #
+#######################################################################
+
+for classfile in $CLASSLIST; do
+
+ cbq_load_class $classfile
+ 
+ ### Create class and setup leaf qdisc
+ tc class add dev $DEVICE parent $PARENT classid $CLASSID cbq \
+ bandwidth $BANDWIDTH rate $RATE weight $WEIGHT prio $PRIO \
+ allot 1514 cell 8 maxburst 20 avpkt 1000 $BOUNDED $ISOLATED
+ 
+ ### Setup leaf queueing discipline
+ if [ "$LEAF" = "tbf" ]; then
+  tc qdisc add dev $DEVICE parent $CLASSID tbf \
+  rate $RATE buffer $BUFFER limit $LIMIT mtu $MTU $PEAK
+ elif [ "$LEAF" = "sfq" ]; then
+  tc qdisc add dev $DEVICE parent $CLASSID sfq \
+  $PERTURB $QUANTUM
+ elif [ "$LEAF" = "cbq" ]; then
+  :
+ fi
+
+
+ ### Create u32 filter for addresses specified by RULE fields
+ RULESET=`echo "$CFILE"| sed -n '/^RULE/ { s/.*=//; p; }'`
+ [ -z "$RULESET" ] && continue
+ 
+ ### Rules present, parse them
+ for rule in $RULESET; do
+  u32_s=""; u32_d=""
+  SADDR=""; SPORT=""
+ 
+  ### Split up destination
+  DST=${rule##*,}
+  DADDR=${DST%%:*}
+  
+  [ "$DADDR" != "$DST" ] && DPORT=${DST##*:} || DPORT=""
+  [ "$DADDR" = "*" ] && DADDR=""
+   
+  ### Split up source (if specified)
+  if [ "$DST" != "$rule" ]; then
+   SRC=${rule%%,*}
+   SADDR=${SRC%%:*}
+   
+   [ "$SADDR" != "$SRC" ] && SPORT=${SRC##*:}
+   [ "$SADDR" = "*" ] && SADDR=""
+  fi
+  
+  ### Compose the u32 filter rules
+  [ -n "$SPORT" ] && u32_s="match ip sport $SPORT 0xffff"
+  [ -n "$SADDR" ] && u32_s="match ip src $SADDR $u32_s"
+  [ -n "$DPORT" ] && u32_d="match ip dport $DPORT 0xffff"
+  [ -n "$DADDR" ] && u32_d="match ip dst $DADDR $u32_d"
+      
+  ### Uncomment the following if you want to see parsed rules
+  # echo "$rule: $u32_s $u32_d"
+  
+  ### Attach u32 filter to the appropriate class
+  tc filter add dev $DEVICE parent 1:0 protocol ip \
+  prio 100 u32 $u32_s $u32_d flowid $CLASSID
+ done ### rule
+ 
+done ### class file
+ ;;
+ 
+ ### TIMECHECK ###
+ timecheck)
+
+### Load DEVICES, DEVFIELDS and CLASSLIST
+cbq_init
+
+### Current time in hh:mm format
+TIME_NOW=`date +%k:%M`
+TIME_ABS=$[${TIME_NOW%%:*}*60 + ${TIME_NOW##*:}]
+
+### Check every config file for TIME parameter
+for classfile in $CLASSLIST; do
+
+ TIMERATES=`sed -ne 's/#.*//; s/ //g; /^TIME/ { s/.*=//; p; }' $CBQ_PATH/$classfile`
+ [ -z "$TIMERATES" ] && continue
+ 
+ MATCH=0; CHANGE=0;
+ for timerate in $TIMERATES; do
+  
+  ### Split up TIME parameter    
+      INTERVAL=${timerate%%;*}; PARAMS=${timerate##*;}
+  BEG_TIME=${INTERVAL%%-*}; END_TIME=${INTERVAL##*-}
+  
+  ### Compute interval boundaries
+  BEG_ABS=$[${BEG_TIME%%:*}*60 + ${BEG_TIME##*:}] 
+  END_ABS=$[${END_TIME%%:*}*60 + ${END_TIME##*:}]
+  
+  ### Midnight wrap fixup 
+  if [ $BEG_ABS -gt $END_ABS ]; then
+   [ $TIME_ABS -le $END_ABS ] && TIME_ABS=$[TIME_ABS + 24*60]
+   END_ABS=$[END_ABS + 24*60]
+  fi
+ 
+  ### If the time matches, remembers params and set flag
+  if [ $TIME_ABS -ge $BEG_ABS -a $TIME_ABS -lt $END_ABS ]; then
+   TMP_RATE=${PARAMS%%/*}
+   TMP_WGHT=${PARAMS#*/}
+   TMP_PEAK=${TMP_WGHT#*/}
+   
+   [ "$TMP_PEAK" = "$TMP_WGHT" ] && TMP_PEAK="" || TMP_WGHT={$TMP_WGHT%%/*}
+    
+   [ -n "$TMP_PEAK" ] && TMP_PEAK="peakrate $TMP_PEAK"
+   MATCH=1
+  fi
+ done ### timerate
+
+ cbq_load_class $classfile
+       
+ ### Get current RATE of CBQ class
+ RATE_NOW=`tc class show dev $DEVICE| sed -n \
+     "/cbq $CLASSID / { s/.*rate //; s/ .*//; p; q; }"`
+ [  -z "$RATE_NOW" ] && continue
+ 
+ ### Time interval match is found
+ if [ $MATCH -ne 0 ]; then
+ 
+  ### Check if there is any change in class RATE
+  if [ "$RATE_NOW" != "$TMP_RATE" ]; then
+   NEW_RATE="$TMP_RATE"
+   NEW_WGHT="$TMP_WGHT"
+   NEW_PEAK="$TMP_PEAK"
+   CHANGE=1
+  fi
+ 
+ ### Match not found, reset to default RATE if necessary
+ elif [ "$RATE_NOW" != "$RATE" ]; then 
+  NEW_WGHT="$WEIGHT"
+  NEW_RATE="$RATE"
+  NEW_PEAK="$PEAK"
+  CHANGE=1
+ fi
+ 
+ ### If there's a change, replace CBQ class and leaf qdisc
+ [ $CHANGE -ne 1 ] && continue
+ 
+ ### Get leaf qdisc handle
+ LEAF_HND=`tc class show dev $DEVICE| sed -n \
+    "/cbq $CLASSID .* leaf / { s/.*leaf //; s/ .*//; p; q; }"`
+ [ -z "$LEAF_HND" ] && continue
+    
+ ### Replace CBQ class  
+ tc class replace dev $DEVICE classid $CLASSID cbq \
+ bandwidth $BANDWIDTH rate $NEW_RATE weight $NEW_WGHT prio $PRIO \
+ allot 1514 cell 8 maxburst 20 avpkt 1000 $BOUNDED $ISOLATED
+ 
+ ### Replace leaf qdisc
+ if [ "$LEAF" = "tbf" ]; then
+  tc qdisc replace dev $DEVICE handle $LEAF_HND tbf \
+  rate $NEW_RATE buffer $BUFFER limit $LIMIT mtu $MTU $NEW_PEAK
+ elif [ "$LEAF" = "sfq" ]; then
+  ### SFQ does not support parameter changes
+  ### yet so it does not need replacing
+  
+  #tc qdisc replace dev $DEVICE handle $LEAF_HND sfq \
+  #$PERTURB $QUANTUM
+  :
+ elif [ "$LEAF" = "cbq" ]; then
+  :
+ fi
+
+ echo "**CBQ: $TIME_NOW: class $CLASS on $DEVICE changed rate ($RATE_NOW -> $NEW_RATE)"
+done ### class file
+
+ ;;
+ 
+ ### STOP ###
+ stop)
+  cbq_off
+ ;;
+ 
+ ### RESTART ###
+ restart)
+  $0 stop
+  $0 start
+ ;;
+ 
+ ### LIST ###
+ list)
+  cbq_init
+  cbq_show
+ ;;
+ 
+ ### STATS ###
+ stats)
+  cbq_init
+  cbq_show -s
+ ;;
+  
+ ### default ###
+ *)
+  echo "Usage: " `basename $0` "{start|stop|restart|timecheck|list|stats}"
+esac

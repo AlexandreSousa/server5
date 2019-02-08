@@ -1,0 +1,26 @@
+dialog --msgbox "Vamos as configurações iniciais do seu servidor linux" 10 30
+
+
+	INT=$( dialog --stdout --inputbox 'Qual e a sua placa de rede que esta conectada a internet? Ex.: eth0' 0 0)
+	EXT=$( dialog --stdout --inputbox 'Qual a placa de rede que os clientes se conectam? Ex.: wlan0 ra0 eth1' 0 0) 
+	AD1=$( dialog --stdout --inputbox 'Informe o ip do Administrador 1' 0 0)
+	AD2=$( dialog --stdout --inputbox 'Informe o ip do Administrador 2' 0 0)
+	AD3=$( dialog --stdout --inputbox 'Informe o ip do Administrador 3' 0 0)
+	SP=$( dialog --stdout --inputbox 'Informe a posta do ssh normalmente e a porta 22' 0 0)
+	WP=$( dialog --stdout --inputbox 'Informe a porta do Webmin normalmente e a porta 10000' 0 0)
+	dialog --msgbox "Ok agora que ja tenho todas as informações irei configurar o cistema pra voce" 0 0
+	touch /etc/fw.conf
+	echo WAN1=$INT > /etc/fw.conf
+	echo WAN2=$INT >> /etc/fw.conf
+	echo LAN1=$EXT >> /etc/fw.conf
+	echo LAN2=$EXT >> /etc/fw.conf
+	echo LAN3=$EXT >> /etc/fw.conf
+	echo LOCAL=/etc/firewall >> /etc/fw.conf
+	echo ARCH=/etc/squid/clientes/ipsandmacs >> /etc/fw.conf
+	echo ADMIN1=$AD1 >> /etc/fw.conf
+	echo ADMIN1=$AD2 >> /etc/fw.conf
+	echo ADMIN1=$AD3 >> /etc/fw.conf
+	echo SSHPORT=$SP >> /etc/fw.conf
+	echo WMNPORT=$WP >> /etc/fw.conf
+	echo CBQP=/etc/cbq >> /etc/fw.conf
+	

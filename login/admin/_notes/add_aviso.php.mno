@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_aviso" value="name:id;datatype:int,name:aviso;datatype:blob,name:taget;datatype:string" />
+	<infoitem key="UD_qr_cliente" value="name:id;datatype:int,name:id_cbq;datatype:string,name:id_cliente;datatype:string,name:mac;datatype:string,name:id_esec;datatype:string,name:id_auth;datatype:string,name:situacao;datatype:string,name:ip;datatype:string,name:login;datatype:string,name:senha;datatype:string,name:proxy;datatype:string,name:banda;datatype:string,name:site;datatype:string,name:msg;datatype:blob" />
+</info>

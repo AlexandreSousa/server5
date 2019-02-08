@@ -1,0 +1,86 @@
+#!/bin/bash
+
+### Define as variaveis
+IPT=/sbin/iptables
+IPCLIENTE='/var/www/server/bin/firewall-ips'
+IFACENET=eth3
+
+#### Ativa o roteamento
+echo "1" > /proc/sys/net/ipv4/ip_forward
+
+#### Limpa as regras
+$IPT -F
+$IPT -X
+$IPT -Z
+$IPT -F -t nat
+$IPT -X -t nat
+$IPT -Z -t nat
+
+#### Define a politica padrao
+$IPT -P INPUT ACCEPT
+$IPT -P FORWARD DROP
+$IPT -P OUTPUT ACCEPT
+
+#### Libera o interface
+$IPT -A INPUT -i lo -j ACCEPT
+$IPT -A OUTPUT -o lo -j ACCEPT
+
+#### Filtros
+#  Bloquear Netbios
+$IPT -A INPUT -p udp --dport 137:139 -j DROP
+$IPT -A INPUT -p tcp --dport 137:139 -j DROP
+$IPT -A INPUT -p tcp --dport 445 -j DROP
+
+$IPT -A FORWARD -p udp --dport 137:139 -j DROP
+$IPT -A FORWARD -p tcp --dport 137:139 -j DROP
+$IPT -A FORWARD -p tcp --dport 445 -j DROP
+
+# Bloquear o uso de Proxy externo
+$IPT -A FORWARD -p tcp --dport 3128 -j DROP
+$IPT -A FORWARD -p tcp --dport 8080 -j DROP
+
+# Bloquear acesso externo a porta do virtual host de autenticacao
+$IPT -A INPUT -i $IFACENET -p tcp --dport 82 -j DROP
+
+#### Redireciona toda a rede
+grep "^" $IPCLIENTE | while read IP;
+do
+
+#Regra de Redirecionamento
+#iptables -t nat -A PREROUTING -s 192.168.25.0/24 -p tcp --dport 80 -j DNAT --to 192.168.25.1:82
+
+# Cria uma nova chain (cadeia)
+$IPT -t nat -N "PRE-$IP"
+# Redireciona o trafego do IP do cliente da porta 80 pra porta 82 onde roda o virtual host do apache
+$IPT -t nat -A "PRE-$IP" -p tcp -s $IP --dport 80 -j REDIRECT --to-port 82
+# Redireciona o tráfego do IP do cliente da porta 80 pra cadeia com o IP
+$IPT -t nat -A PREROUTING -p tcp -s $IP --dport 80 -j "PRE-$IP"
+# Bloqueia conexões de entrada da porta 0 ate 1024 com destino ao IP do cliente
+$IPT -A FORWARD -s 0/0 -d $IP -p tcp --dport 0:1024 -j DROP
+
+done
+
+#### Ativa os modulos do Kernel
+modprobe ip_conntrack
+modprobe ip_conntrack_ftp
+modprobe ip_nat_ftp
+modprobe ip_queue
+modprobe ip_tables
+modprobe ipt_LOG
+modprobe ipt_MARK
+modprobe ipt_MASQUERADE
+modprobe ipt_REDIRECT
+modprobe ipt_REJECT
+modprobe ipt_TCPMSS
+modprobe ipt_TOS
+modprobe ipt_limit
+modprobe ipt_mac
+modprobe ipt_mark
+modprobe ipt_multiport
+modprobe ipt_owner
+modprobe ipt_state
+modprobe ipt_tcpmss
+modprobe ipt_tos
+modprobe iptable_filter
+modprobe iptable_mangle
+modprobe iptable_nat

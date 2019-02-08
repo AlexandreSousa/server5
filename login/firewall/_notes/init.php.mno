@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_aut" value="name:id;datatype:int,name:id_cliente;datatype:string,name:ip;datatype:string,name:mac;datatype:string,name:login;datatype:string,name:senha;datatype:string" />
+	<infoitem key="UD_qr_parametros" value="name:id;datatype:int,name:site;datatype:string,name:fone;datatype:string,name:time;datatype:string,name:ip_server;datatype:string,name:p_proxy;datatype:string" />
+	<infoitem key="UD_qr_iface_net" value="name:id;datatype:int,name:desc;datatype:string,name:eth;datatype:string" />
+</info>

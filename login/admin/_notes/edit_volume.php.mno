@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_volume" value="name:id;datatype:int,name:down;datatype:int,name:up;datatype:int,name:tipo;datatype:string,name:mensal;datatype:string,name:randon;datatype:string" />
+</info>

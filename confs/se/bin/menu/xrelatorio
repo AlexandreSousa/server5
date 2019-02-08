@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+# Script que utiliza menu de opcoes em dialog
+# Carlos Carvalho <alexandresousa2005@yahoo.com.br>
+
+# Impede control+c
+trap 2 exit
+while : ; do
+
+# Menu de Opcoes
+  clear
+
+TXT=$(cat /home/user/menu.sistema-x2)
+opcao=`dialog --stdout --backtitle "SISTEMA SISTEMA-X           ALEXANDRESOUSA &UNIAOMAKER CONFIGURACAO DO SARG" --menu "$serv SISTEMA-X" 0 80 10 \
+0 "Sair da configuracao do Sarg(sair)" \
+1 "Gera Relatorio" \
+1 "Editar os usuarios do Sarg (Aparece nos relatorios)" \
+9 "Fale conosco"`
+
+case $opcao in 
+	0)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "A cada dia estamos trabalhando para melhorar o nosso Saistema SISTEMA-X"
+      echo
+      echo
+      exit
+	;;
+         1)
+# Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      nome=$( dialog --stdout --inputbox 'Digite seu nome:' 0 0 )
+      ip=$( dialog --stdout --inputbox 'Digite o IP do cliente:' 0 0 )
+      sleep 1
+      echo
+      echo
+      echo $ip $nome >>
+      cache 
+	;;
+
+	2)
+
+      # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "O SISTEMA-X ira abrir o arquivo livclientes o mac que estiver cadastrado tera acesso aos sites que estao na lista de proibidos "
+      sleep 2
+      clear
+      cd /etc/squid/clientes
+      mcedit livclientes
+      service squid reload
+      echo "livclientes editada con sucesso"
+      sleep 1
+      echo
+      echo
+       	;;
+ 	3)
+     clear
+     echo "SISTEMA-X ASP"
+     echo "========="
+     echo " "
+     dialog --msgbox  "Nao esta disponivel nesta vercao " 0 0
+	;;
+ 	7)
+      clear
+      echo "SISTEMA-X"
+      echo "====="
+      echo " "
+      echo " "
+	;;                 
+  	8)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo " "
+      echo "Esta opcao permite a execucao de teste de performance e comunicacao"
+      echo "entre o SERVIDOR SISTEMA-X ASP e seu micro."
+      echo "Sera transferido um arquivo com 2 milhoes de caracteres, permitindo"
+      echo "a avaliacao do tempo de transmissao, e a comparacao com outros sistemas"
+      echo "  "
+      echo "Acione Enter para inicar - Podera levar varios minutos"
+      read nada
+      clear
+      inicio=`date`
+      cat /etc/msg/teste_tx
+      fim=`date`
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo " "
+      echo "Inicio as " $inicio
+      echo "Termino as " $fim
+      echo "  "
+      cat /etc/msg/teste_tx_tab
+      echo "  "
+      echo "Acione Enter"
+      read nada
+	;;
+	9)
+     # Sistema SISTEMA-X
+      clear
+dialog --msgbox "Sistema SISTEMA-X
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Telefone : (93) 3552-1386
+Segunda a sexta - 09:00 as 18:00
+Email : alexandresousa2005@yahoo.com.br
+Home Page : http://www.uniaomaker.com.br" 0 0
+      ;;
+esac
+done

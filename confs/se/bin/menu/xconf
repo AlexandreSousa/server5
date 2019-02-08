@@ -1,0 +1,150 @@
+#!/bin/bash
+#
+# Script que utiliza menu de opcoes em dialog
+# Carlos Carvalho <alexandresousa2005@yahoo.com.br>
+
+# Impede control+c
+trap 2 exit
+while : ; do
+
+# Menu de Opcoes
+  clear
+
+TXT=$(cat /home/user/menu.sistema-x2)
+opcao=`dialog --stdout --backtitle "SISTEMA SISTEMA-X 1.0          ALEXANDRE SOUSA & UNIAOMAKER" --menu "$serv SISTEMA-X 1.0          ## MENU PRINCIPAL ##" 0 80 18 \
+0 "Desativar sua sessao (sair)" \
+1 "Manutencao dos clientes (Cadastrar ou Bloquear" \
+2 "Configuracoes do squid (permicao de acesso)" \
+3 "Configuracao do firewall e limite de banda" \
+4 "Atualizar SISTEMA-X" \
+6 "Usuarios Oline" \
+7 "Configuraçãos do Sistema" \
+9 "Fale conosco"`
+
+case $opcao in 
+	0)
+     # Sistema SISTEMA-X 
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "A cada dia estamos trabalhando para melhorar o nosso Sistema SISTEMA-X"
+      echo
+      echo
+      /etc/reglog LOGOUT_ACESSO_LINUX
+      exit
+	;;
+	1)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "O SISTEMA-X ira abrir o arquivo ipsandmacs"
+      sleep 2
+      cd /etc/squid/clientes
+      sudo mcedit ipsandmacs
+      echo "Irei recarregar o firewall"
+      sleep 1
+      sudo service firewall restart
+      echo
+      cache 
+	;;
+	2)
+      # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo "O SISTEMA-X"
+      cd /bin/menu
+      ./csquid
+      echo
+    	;;
+
+ 	3)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo
+      cd /bin/menu
+      ./fcbq
+      echo
+      ;;
+        4)
+      # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo
+      echo
+      echo
+      dialog --msgbox "o sistema ainda nao esta habilitado" 0 0
+      	;;
+ 	6)
+     clear
+     echo "SISTEMA-X ASP"
+     echo "========="
+     echo " "
+     echo "Clientes conectados ao SISTEMA-X ASP, neste momento : "
+     echo " "
+     arp
+     echo " Aperte uma tecla para proseguir "
+     read nada
+	;;
+ 	7)
+      clear
+      echo "SISTEMA-X"
+      echo "====="
+      echo " "
+      echo " "
+      cd /bin/menu
+	./config
+	;;                 
+  	8)
+     # Sistema SISTEMA-X
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo " "
+      echo "Esta opcao permite a execucao de teste de performance e comunicacao"
+      echo "entre o SERVIDOR SISTEMA-X ASP e seu micro."
+      echo "Sera transferido um arquivo com 2 milhoes de caracteres, permitindo"
+      echo "a avaliacao do tempo de transmissao, e a comparacao com outros sistemas"
+      echo "  "
+      echo "Acione Enter para inicar - Podera levar varios minutos"
+      read nada
+      clear
+      inicio=`date`
+      cat /etc/msg/teste_tx
+      fim=`date`
+      clear
+      echo "Sistema SISTEMA-X"
+      echo "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+      echo " "
+      echo "Inicio as " $inicio
+      echo "Termino as " $fim
+      echo "  "
+      cat /etc/msg/teste_tx_tab
+      echo "  "
+      echo "Acione Enter"
+      read nada
+	;;
+	9)
+     # Sistema SISTEMA-X
+      clear
+dialog --msgbox "Sistema SISTEMA-X
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Telefone : (93) 552-1386
+Segunda a sexta - 09:00 as 18:00
+Email : alexandre@uniaomaker.com.br
+Home Page : http://www.uniaomaker.com.br" 0 0
+      ;;
+esac
+done

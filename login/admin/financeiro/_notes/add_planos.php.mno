@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_qr_planos" value="name:id;datatype:int,name:plano;datatype:string,name:descricao;datatype:string,name:valor;datatype:string,name:velocidade;datatype:string,name:velocidade_nominal;datatype:string,name:adesao;datatype:string,name:multa;datatype:string,name:website;datatype:string" />
+	<infoitem key="UD_qr_banda" value="name:id;datatype:int,name:id_cbq;datatype:string,name:desc;datatype:string,name:banda_down;datatype:string,name:div_down;datatype:string,name:prio_down;datatype:string,name:banda_up;datatype:string,name:div_up;datatype:string,name:prio_up;datatype:string" />
+</info>

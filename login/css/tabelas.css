@@ -1,0 +1,151 @@
+@charset "utf-8";
+.topo {
+	background-color: #333333;
+	color: #FFFFFF;
+}
+
+/* CSS Document */
+
+#tabela_exemplo th {
+	
+	background-color: #666666;
+	color: #CCCCCC;
+	
+}
+	#tabela_exemplo, #tabela_exemplo td {
+	
+	border: 1px solid #666666;
+	border-collapse: collapse;
+	text-align: center;
+	padding: 4px;
+	
+	}
+#tabela2 td {
+	text-align: justify;
+	padding: 4px;
+	border: 1px solid #666666;
+}
+.BnT {
+	font-weight: bold;
+	color: #003366;
+	background-image: url(../imagens/message_toolbar_tile.gif);
+	height: 28px;
+	width: 140px;
+	border: 1px dashed #FF0000;
+}
+#form1  #tabela2  .BnT:hover {
+	background-color: #000033;
+	height: 28px;
+	width: 140px;
+	border: 1px solid #009900;
+	color: #003300;
+}
+
+	
+ .tab1 tr:hover { background-color: #ddd; }
+.imputTxt {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #000000;
+	border: 1px solid #000000;
+	background-color: #E8F4FF;
+}
+.calendario {
+	background-image: url(../imagens/vcalendar.png);
+}
+.linha_tabela {
+	margin-top: auto;
+	margin-right: auto;
+	margin-bottom: auto;
+	margin-left: auto;
+	padding-top: 1px;
+	padding-right: 1px;
+	padding-bottom: 1px;
+	padding-left: 1px;
+}
+.tabels_fundo {
+	background-color: #D4D4D4;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.linha_tabela {
+	border: thin dotted #292929;
+}
+.bnt_link {
+	height: 80px;
+	width: 100px;
+	font-family: Georgia, "Times New Roman", Times, serif;
+}
+.campoFocus
+{
+	font-family:			Verdana;
+	font-size:				12px;
+	height:                 26px;
+	background-color:		#F2F2F2;
+	border:					1px solid #0063CE;
+	
+	padding-left: 			5px;
+	padding-right: 			5px;
+	padding-top: 			4px;
+	padding-bottom: 		4px;
+	
+	-moz-border-radius: 	5px;
+	border-radius: 			5px;
+	-webkit-border-radius: 	5px;
+	
+	box-shadow: 			#DEDEDE 1px 1px 1px;
+  	-webkit-box-shadow: 	#DEDEDE 1px 1px 1px;
+ 	-moz-box-shadow: 		#DEDEDE 1px 1px 1px;
+	
+}
+input.campo
+{
+	font-family:			Verdana;
+	font-size:				12px;
+	height:                 26px;
+	background-color:		#F2F2F2;
+	border:					1px solid #CCCCCC;
+	
+	padding-left: 			5px;
+	padding-right: 			5px;
+	padding-top:			4px;
+	padding-bottom: 		4px;
+	
+	-moz-border-radius: 	5px;
+	border-radius: 			5px;
+	-webkit-border-radius: 	5px;
+	
+	box-shadow: 			#DEDEDE 1px 1px 0px;
+	-webkit-box-shadow: 	#DEDEDE 1px 1px 0px;
+	-moz-box-shadow: 		#DEDEDE 1px 1px 0px;
+	
+}
+/* Button
+----------------------------------*/
+
+.ui-button { display: inline-block; position: relative; padding: 0; margin-right: .1em; text-decoration: none !important; cursor: pointer; text-align: center; zoom: 1; overflow: visible; } /* the overflow property removes extra width in IE */
+.ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
+button.ui-button-icon-only { width: 2.4em; } /* button elements seem to need a little more width */
+.ui-button-icons-only { width: 3.4em; } 
+button.ui-button-icons-only { width: 3.7em; } 
+
+/*button text element */
+.ui-button .ui-button-text { display: block; line-height: 1.4;  }
+.ui-button-text-only .ui-button-text { padding: .2em 1em; }
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: .2em; text-indent: -9999999px; }
+.ui-button-text-icon .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .2em 1em .2em 2.1em; }
+.ui-button-text-icons .ui-button-text { padding-left: 2.1em; padding-right: 2.1em; }
+/* no icon support for input elements, provide padding by default */
+input.ui-button { padding: .2em 1em; }
+
+/*button icon element(s) */
+.ui-button-icon-only .ui-icon, .ui-button-text-icon .ui-icon, .ui-button-text-icons .ui-icon, .ui-button-icons-only .ui-icon { position: absolute; top: 50%; margin-top: -8px; }
+.ui-button-icon-only .ui-icon { left: 50%; margin-left: -8px; }
+.ui-button-text-icon .ui-button-icon-primary, .ui-button-text-icons .ui-button-icon-primary, .ui-button-icons-only .ui-button-icon-primary { left: .5em; }
+.ui-button-text-icons .ui-button-icon-secondary, .ui-button-icons-only .ui-button-icon-secondary { right: .5em; }
+
+/*button sets*/
+.ui-buttonset { margin-right: 7px; }
+.ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
+
+/* workarounds */
+button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra padding in Firefox */
